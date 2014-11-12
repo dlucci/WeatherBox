@@ -9,9 +9,13 @@
     tools:context=".WeatherActivity">
 
     <TextView
-        android:id="@+id/weeather"
-        android:text="@string/hello_world"
+        android:id="@+id/temperature"
+        android:text="Weather Loading...."
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </RelativeLayout>

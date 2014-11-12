@@ -6,6 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +32,10 @@ public class WeatherActivity extends Activity {
     private static final String TAG = "WeatherActivity";
     private static String API_KEY;
 
+    private String temperatureF;
+    private TextView tempF;
+    private ImageView weatherIcon;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +43,14 @@ public class WeatherActivity extends Activity {
 
         API_KEY = getString(R.string.weatherApi);
 
-       new WeatherTask().execute();
+        tempF = (TextView)findViewById(R.id.temperature);
+        weatherIcon = (ImageView)findViewById(R.id.icon);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        new WeatherTask().execute();
     }
 
 
@@ -58,8 +73,15 @@ public class WeatherActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+/*
+ * We need to add a check for if there is a connection to the interblag
+ * 
+ */
+
 
     private class WeatherTask extends AsyncTask<Void, Void, Void>{
+
+        private String imageUrl;
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -78,8 +100,11 @@ public class WeatherActivity extends Activity {
                 JSONObject json = new JSONObject(result.toString());
                 JSONObject json1 = json.getJSONObject("data").getJSONArray("current_condition").getJSONObject(0);
 
-                Log.d(TAG, json1.getString("temp_F"));
+                temperatureF = json1.getString("temp_F");
 
+                JSONObject symbol = json1.getJSONArray("weatherIconUrl").getJSONObject(0);
+
+                imageUrl = symbol.getString("value");
             }catch(MalformedURLException e){
                 Log.e(TAG, "URL is malformed:  " + e.getMessage());
             }catch(IOException e){
@@ -90,6 +115,19 @@ public class WeatherActivity extends Activity {
 
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void args){
+            if(temperatureF == null)
+                tempF.setText("Unable to load temperature");
+            else
+                tempF.setText(temperatureF);
+
+            if(imageUrl == null)
+                Log.d(TAG, ":-(");
+            else
+                Picasso.with(getApplicationContext()).load(imageUrl).into(weatherIcon);
         }
     }
 }
