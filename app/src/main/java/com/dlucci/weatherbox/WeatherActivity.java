@@ -98,10 +98,12 @@ public class WeatherActivity extends Activity {
                 double longitude = location.getLongitude();
                 Geocoder geo = new Geocoder(getApplicationContext());
                 List<Address> list = geo.getFromLocation(latitude, longitude, 1);
+                if(list.size() == 0)
+                    return null;
                 Address addr = list.get(0);
 
                 URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q=" + addr.getPostalCode() + "&format=json&num_of_days=5&key="+API_KEY);
-                //URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q=44114&format=json&num_of_days=5&key="+API_KEY);
+
                 HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
 
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
@@ -141,7 +143,7 @@ public class WeatherActivity extends Activity {
                 tempF.setText(temperatureF + "°F/" + temperatureC + "°C");
 
             if(imageUrl == null)
-                Log.d(TAG, ":-(");
+                weatherIcon.setImageResource(R.drawable.oh_no);
             else
                 Picasso.with(getApplicationContext()).load(imageUrl).into(weatherIcon);
         }
