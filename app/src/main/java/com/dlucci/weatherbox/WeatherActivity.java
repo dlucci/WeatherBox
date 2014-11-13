@@ -1,6 +1,7 @@
 package com.dlucci.weatherbox;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
@@ -14,6 +15,11 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ResponseBody;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -30,8 +36,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.Properties;
-
 
 public class WeatherActivity extends Activity {
 
@@ -42,6 +46,8 @@ public class WeatherActivity extends Activity {
     private TextView tempF;
     private ImageView weatherIcon;
 
+    private ProgressDialog dialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +57,9 @@ public class WeatherActivity extends Activity {
 
         tempF = (TextView)findViewById(R.id.temperature);
         weatherIcon = (ImageView)findViewById(R.id.icon);
+        dialog = new ProgressDialog(this);
+        dialog.setTitle("Please wait.  Weather is loading...");
+        dialog.show();
     }
 
     @Override
@@ -89,6 +98,8 @@ public class WeatherActivity extends Activity {
 
         private String imageUrl;
 
+        private OkHttpClient client = new OkHttpClient();
+
         @Override
         protected Void doInBackground(Void... params) {
             try {
@@ -104,7 +115,7 @@ public class WeatherActivity extends Activity {
 
                 URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q=" + addr.getPostalCode() + "&format=json&num_of_days=5&key="+API_KEY);
 
-                HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+                /*HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
 
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
                 BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -112,17 +123,27 @@ public class WeatherActivity extends Activity {
                 String line;
                 while((line = br.readLine()) != null){
                     result.append(line);
-                }
+                }*/
 
+                Request request = new Request.Builder().url(url).build();
+                ResponseBody response = client.newCall(request).execute().body();
+                Log.d(TAG, response.string());
+                //InputStream is = response.byteStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(response.byteStream()));
+                StringBuilder result = new StringBuilder();
+                String line;
+                while((line = br.readLine()) != null){
+                    result.append(line);
+                }
                 JSONObject json = new JSONObject(result.toString());
-                JSONObject json1 = json.getJSONObject("data").getJSONArray("current_condition").getJSONObject(0);
+                /*JSONObject json1 = json.getJSONObject("data").getJSONArray("current_condition").getJSONObject(0);
 
                 temperatureF = json1.getString("temp_F");
                 temperatureC = json1.getString("temp_C");
 
                 JSONObject symbol = json1.getJSONArray("weatherIconUrl").getJSONObject(0);
 
-                imageUrl = symbol.getString("value");
+                imageUrl = symbol.getString("value");*/
             }catch(MalformedURLException e){
                 Log.e(TAG, "URL is malformed:  " + e.getMessage());
             }catch(IOException e){
@@ -131,12 +152,12 @@ public class WeatherActivity extends Activity {
                 Log.e(TAG, "JSONException:  " + e.getMessage());
             }
 
-
             return null;
         }
 
         @Override
         protected void onPostExecute(Void args){
+            dialog.dismiss();
             if(temperatureF == null)
                 tempF.setText("Unable to load temperature");
             else
