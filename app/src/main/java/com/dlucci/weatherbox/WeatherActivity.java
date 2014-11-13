@@ -1,6 +1,11 @@
 package com.dlucci.weatherbox;
 
 import android.app.Activity;
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +29,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Properties;
 
 
@@ -86,7 +92,16 @@ public class WeatherActivity extends Activity {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q=44114&format=json&num_of_days=5&key="+API_KEY);
+                LocationManager manager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+                Location location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
+                Geocoder geo = new Geocoder(getApplicationContext());
+                List<Address> list = geo.getFromLocation(latitude, longitude, 1);
+                Address addr = list.get(0);
+
+                URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q=" + addr.getPostalCode() + "&format=json&num_of_days=5&key="+API_KEY);
+                //URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q=44114&format=json&num_of_days=5&key="+API_KEY);
                 HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
 
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
@@ -123,7 +138,7 @@ public class WeatherActivity extends Activity {
             if(temperatureF == null)
                 tempF.setText("Unable to load temperature");
             else
-                tempF.setText(temperatureF + "° F/" + temperatureC + "° C");
+                tempF.setText(temperatureF + "°F/" + temperatureC + "°C");
 
             if(imageUrl == null)
                 Log.d(TAG, ":-(");

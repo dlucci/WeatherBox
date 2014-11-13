@@ -10,7 +10,7 @@
 
     <TextView
         android:id="@+id/temperature"
-        android:text="Weather Loading...."
+        android:text="-°F/-°C"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <ImageView
