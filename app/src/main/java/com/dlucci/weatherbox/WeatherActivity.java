@@ -32,7 +32,7 @@ public class WeatherActivity extends Activity {
     private static final String TAG = "WeatherActivity";
     private static String API_KEY;
 
-    private String temperatureF;
+    private String temperatureF, temperatureC;
     private TextView tempF;
     private ImageView weatherIcon;
 
@@ -75,7 +75,7 @@ public class WeatherActivity extends Activity {
 
 /*
  * We need to add a check for if there is a connection to the interblag
- * 
+ *
  */
 
 
@@ -101,6 +101,7 @@ public class WeatherActivity extends Activity {
                 JSONObject json1 = json.getJSONObject("data").getJSONArray("current_condition").getJSONObject(0);
 
                 temperatureF = json1.getString("temp_F");
+                temperatureC = json1.getString("temp_C");
 
                 JSONObject symbol = json1.getJSONArray("weatherIconUrl").getJSONObject(0);
 
@@ -122,7 +123,7 @@ public class WeatherActivity extends Activity {
             if(temperatureF == null)
                 tempF.setText("Unable to load temperature");
             else
-                tempF.setText(temperatureF);
+                tempF.setText(temperatureF + "° F/" + temperatureC + "° C");
 
             if(imageUrl == null)
                 Log.d(TAG, ":-(");
