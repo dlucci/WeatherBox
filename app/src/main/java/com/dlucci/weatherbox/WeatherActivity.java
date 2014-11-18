@@ -1,6 +1,7 @@
 package com.dlucci.weatherbox;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
@@ -30,7 +31,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.Properties;
 
 
 public class WeatherActivity extends Activity {
@@ -41,6 +41,8 @@ public class WeatherActivity extends Activity {
     private String temperatureF, temperatureC;
     private TextView tempF;
     private ImageView weatherIcon;
+
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,10 @@ public class WeatherActivity extends Activity {
     @Override
     public void onResume(){
         super.onResume();
+
+        dialog = new ProgressDialog(this);
+        dialog.setTitle("Please wait.  Weather loading....");
+        dialog.show();
         new WeatherTask().execute();
     }
 
@@ -88,6 +94,7 @@ public class WeatherActivity extends Activity {
     private class WeatherTask extends AsyncTask<Void, Void, Void>{
 
         private String imageUrl;
+        private String zipcode;
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -101,8 +108,8 @@ public class WeatherActivity extends Activity {
                 if(list.size() == 0)
                     return null;
                 Address addr = list.get(0);
-
-                URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q=" + addr.getPostalCode() + "&format=json&num_of_days=5&key="+API_KEY);
+                zipcode = addr.getPostalCode();
+                URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q=" + zipcode + "&format=json&num_of_days=5&key="+API_KEY);
 
                 HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
 
@@ -131,16 +138,18 @@ public class WeatherActivity extends Activity {
                 Log.e(TAG, "JSONException:  " + e.getMessage());
             }
 
-
             return null;
         }
 
         @Override
         protected void onPostExecute(Void args){
+
+            dialog.dismiss();
+
             if(temperatureF == null)
                 tempF.setText("Unable to load temperature");
             else
-                tempF.setText(temperatureF + "°F/" + temperatureC + "°C");
+                tempF.setText(temperatureF + "°F/" + temperatureC + "°C in " + zipcode);
 
             if(imageUrl == null)
                 weatherIcon.setImageResource(R.drawable.oh_no);
