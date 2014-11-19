@@ -108,6 +108,7 @@ public class WeatherActivity extends Activity {
                 if(list.size() == 0)
                     return null;
                 Address addr = list.get(0);
+                
                 zipcode = addr.getPostalCode();
                 URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q=" + zipcode + "&format=json&num_of_days=5&key="+API_KEY);
 
