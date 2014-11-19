@@ -1,8 +1,9 @@
 package com.dlucci.weatherbox;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.database.MatrixCursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -13,8 +14,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.dlucci.weatherbox.model.Weather;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -33,7 +37,7 @@ import java.net.URL;
 import java.util.List;
 
 
-public class WeatherActivity extends Activity {
+public class WeatherActivity extends ListActivity {
 
     private static final String TAG = "WeatherActivity";
     private static String API_KEY;
@@ -47,22 +51,24 @@ public class WeatherActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_weather);
+        setContentView(R.layout.weather_list);
 
         API_KEY = getString(R.string.weatherApi);
 
-        tempF = (TextView)findViewById(R.id.temperature);
-        weatherIcon = (ImageView)findViewById(R.id.icon);
+        dialog = new ProgressDialog(this);
+        dialog.setTitle("Please wait.  Weather loading....");
+        dialog.show();
+        new WeatherTask().execute();
+
+        /*tempF = (TextView)findViewById(R.id.temperature);
+        weatherIcon = (ImageView)findViewById(R.id.icon);*/
     }
 
     @Override
     public void onResume(){
         super.onResume();
 
-        dialog = new ProgressDialog(this);
-        dialog.setTitle("Please wait.  Weather loading....");
-        dialog.show();
-        new WeatherTask().execute();
+
     }
 
 
@@ -95,7 +101,8 @@ public class WeatherActivity extends Activity {
 
         private String imageUrl;
         private String zipcode;
-
+        private Object[] arr = new Object[5];
+        MatrixCursor mc = new MatrixCursor(new String[] {"_id", "tempF", "tempC", "imageURL"});
         @Override
         protected Void doInBackground(Void... params) {
             try {
@@ -123,14 +130,23 @@ public class WeatherActivity extends Activity {
                 }
 
                 JSONObject json = new JSONObject(result.toString());
-                JSONObject json1 = json.getJSONObject("data").getJSONArray("current_condition").getJSONObject(0);
+                //JSONObject json1 = json.getJSONObject("data").getJSONArray("current_condition").getJSONObject(0);
+                JSONArray futureCast = json.getJSONObject("data").getJSONArray("weather");
 
-                temperatureF = json1.getString("temp_F");
-                temperatureC = json1.getString("temp_C");
+                for(int i = 0; i < 5; i++){
+                    JSONObject j = futureCast.getJSONObject(i).getJSONArray("hourly").getJSONObject(0);
+                    Weather weather = new Weather();
+                    weather.setTemperatureC(j.getString("tempC"));
+                    weather.setTemperatureF(j.getString("tempF"));
+                    weather.setImageUrl(j.getJSONArray("weatherIconUrl").getJSONObject(0).getString("value"));
+                    mc.addRow(new Object[]{i, j.getString("tempF"), j.getString("tempC"), j.getJSONArray("weatherIconUrl").getJSONObject(0).getString("value")});
+                }
+                //temperatureF = json1.getString("temp_F");
+                //temperatureC = json1.getString("temp_C");
 
-                JSONObject symbol = json1.getJSONArray("weatherIconUrl").getJSONObject(0);
+                //JSONObject symbol = json1.getJSONArray("weatherIconUrl").getJSONObject(0);
 
-                imageUrl = symbol.getString("value");
+                //imageUrl = symbol.getString("value");
             }catch(MalformedURLException e){
                 Log.e(TAG, "URL is malformed:  " + e.getMessage());
             }catch(IOException e){
@@ -147,7 +163,7 @@ public class WeatherActivity extends Activity {
 
             dialog.dismiss();
 
-            if(temperatureF == null)
+            /*if(temperatureF == null)
                 tempF.setText("Unable to load temperature");
             else
                 tempF.setText(temperatureF + "°F/" + temperatureC + "°C in " + zipcode);
@@ -155,7 +171,15 @@ public class WeatherActivity extends Activity {
             if(imageUrl == null)
                 weatherIcon.setImageResource(R.drawable.oh_no);
             else
-                Picasso.with(getApplicationContext()).load(imageUrl).into(weatherIcon);
+                Picasso.with(getApplicationContext()).load(imageUrl).into(weatherIcon);*/
+
+            ListAdapter adapter = new SimpleCursorAdapter(getApplicationContext(),
+                    R.layout.weather_row,
+                    mc,
+                    new String[]{"_id", "tempF", "tempC", "imageURL"},
+                    new int[]{0,R.id.temperatureF, R.id.temperatureC, R.id.icon});
+
+            setListAdapter(adapter);
         }
     }
 }
