@@ -173,7 +173,7 @@ public class WeatherActivity extends ListActivity {
             else
                 Picasso.with(getApplicationContext()).load(imageUrl).into(weatherIcon);*/
 
-            ListAdapter adapter = new SimpleCursorAdapter(getApplicationContext(),
+            ListAdapter adapter = new WeatherAdapter(getApplicationContext(),
                     R.layout.weather_row,
                     mc,
                     new String[]{"_id", "tempF", "tempC", "imageURL"},
