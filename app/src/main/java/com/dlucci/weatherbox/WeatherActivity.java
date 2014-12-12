@@ -8,6 +8,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -100,6 +101,9 @@ public class WeatherActivity extends ListActivity {
         MatrixCursor mc = new MatrixCursor(new String[] {"_id", "tempF", "tempC", "imageURL"});
         @Override
         protected Void doInBackground(Void... params) {
+            ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            if(cm.getActiveNetworkInfo() == null || !cm.getActiveNetworkInfo().isConnected())
+                return null;
             try {
 
                 LocationManager manager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
