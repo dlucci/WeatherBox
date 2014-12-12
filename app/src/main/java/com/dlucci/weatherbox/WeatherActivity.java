@@ -59,16 +59,11 @@ public class WeatherActivity extends ListActivity {
         dialog.setTitle("Please wait.  Weather loading....");
         dialog.show();
         new WeatherTask().execute();
-
-        /*tempF = (TextView)findViewById(R.id.temperature);
-        weatherIcon = (ImageView)findViewById(R.id.icon);*/
     }
 
     @Override
     public void onResume(){
         super.onResume();
-
-
     }
 
 
@@ -106,6 +101,7 @@ public class WeatherActivity extends ListActivity {
         @Override
         protected Void doInBackground(Void... params) {
             try {
+
                 LocationManager manager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
                 Location location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 double latitude = location.getLatitude();
@@ -130,7 +126,7 @@ public class WeatherActivity extends ListActivity {
                 }
 
                 JSONObject json = new JSONObject(result.toString());
-                //JSONObject json1 = json.getJSONObject("data").getJSONArray("current_condition").getJSONObject(0);
+
                 JSONArray futureCast = json.getJSONObject("data").getJSONArray("weather");
 
                 for(int i = 0; i < 5; i++){
@@ -141,12 +137,7 @@ public class WeatherActivity extends ListActivity {
                     weather.setImageUrl(j.getJSONArray("weatherIconUrl").getJSONObject(0).getString("value"));
                     mc.addRow(new Object[]{i, j.getString("tempF"), j.getString("tempC"), j.getJSONArray("weatherIconUrl").getJSONObject(0).getString("value")});
                 }
-                //temperatureF = json1.getString("temp_F");
-                //temperatureC = json1.getString("temp_C");
 
-                //JSONObject symbol = json1.getJSONArray("weatherIconUrl").getJSONObject(0);
-
-                //imageUrl = symbol.getString("value");
             }catch(MalformedURLException e){
                 Log.e(TAG, "URL is malformed:  " + e.getMessage());
             }catch(IOException e){
@@ -162,17 +153,10 @@ public class WeatherActivity extends ListActivity {
         protected void onPostExecute(Void args){
 
             dialog.dismiss();
-
-            /*if(temperatureF == null)
-                tempF.setText("Unable to load temperature");
-            else
-                tempF.setText(temperatureF + "°F/" + temperatureC + "°C in " + zipcode);
-
-            if(imageUrl == null)
-                weatherIcon.setImageResource(R.drawable.oh_no);
-            else
-                Picasso.with(getApplicationContext()).load(imageUrl).into(weatherIcon);*/
-
+            if(zipcode != null) {
+                TextView zippy = (TextView) findViewById(R.id.zipcode);
+                zippy.setText("This is the weather for " + zipcode);
+            }
             ListAdapter adapter = new WeatherAdapter(getApplicationContext(),
                     R.layout.weather_row,
                     mc,
