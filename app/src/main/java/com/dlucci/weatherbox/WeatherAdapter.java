@@ -60,10 +60,15 @@ public class WeatherAdapter extends SimpleCursorAdapter{
         TextView c = (TextView) v.findViewById(R.id.temperatureC);
         ImageView icon = (ImageView) v.findViewById(R.id.icon);
 
-        if(f != null)
+        if(tempF != null)
             f.setText(tempF);
-        if(c != null)
+        else
+            f.setText("--F");
+
+        if(tempC != null)
             c.setText(tempC);
+        else
+            c.setText("--C");
         if(icon != null) {
             if(imageUrl == null)
                 icon.setImageResource(R.drawable.oh_no);

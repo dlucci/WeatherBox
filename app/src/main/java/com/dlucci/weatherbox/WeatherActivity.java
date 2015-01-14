@@ -49,8 +49,7 @@ public class WeatherActivity extends ListActivity {
 
     private ProgressDialog dialog;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_list);
 
@@ -62,21 +61,21 @@ public class WeatherActivity extends ListActivity {
         new WeatherTask().execute();
     }
 
-    @Override
-    public void onResume(){
+    @Override public void onResume(){
         super.onResume();
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    /*
+        taking this out for now.  i'd like to add some settings once i get this layout working properly
+
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.weather, menu);
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -85,7 +84,7 @@ public class WeatherActivity extends ListActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
 /*
  * We need to add a check for if there is a connection to the interblag
@@ -160,14 +159,21 @@ public class WeatherActivity extends ListActivity {
             if(zipcode != null) {
                 TextView zippy = (TextView) findViewById(R.id.zipcode);
                 zippy.setText("This is the weather for " + zipcode);
-            }
-            ListAdapter adapter = new WeatherAdapter(getApplicationContext(),
-                    R.layout.weather_row,
-                    mc,
-                    new String[]{"_id", "tempF", "tempC", "imageURL"},
-                    new int[]{0,R.id.temperatureF, R.id.temperatureC, R.id.icon});
 
-            setListAdapter(adapter);
+                ListAdapter adapter = new WeatherAdapter(getApplicationContext(),
+                        R.layout.weather_row,
+                        mc,
+                        new String[]{"_id", "tempF", "tempC", "imageURL"},
+                        new int[]{0,R.id.temperatureF, R.id.temperatureC, R.id.icon});
+
+                setListAdapter(adapter);
+            } else {
+                Log.d(TAG, "zipcode is null");
+                ImageView error  = (ImageView)findViewById(R.id.uhoh);
+                error.setImageResource(R.drawable.oh_no);
+            }
+
+
         }
     }
 }
