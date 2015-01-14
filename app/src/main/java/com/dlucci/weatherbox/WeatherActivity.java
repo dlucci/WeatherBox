@@ -14,13 +14,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.dlucci.weatherbox.model.Weather;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,7 +27,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,15 +35,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-
 public class WeatherActivity extends ListActivity {
 
     private static final String TAG = "WeatherActivity";
     private static String API_KEY;
-
-    private String temperatureF, temperatureC;
-    private TextView tempF;
-    private ImageView weatherIcon;
 
     private ProgressDialog dialog;
 
@@ -91,15 +84,13 @@ public class WeatherActivity extends ListActivity {
  *
  */
 
-
     private class WeatherTask extends AsyncTask<Void, Void, Void>{
 
-        private String imageUrl;
         private String zipcode;
         private Object[] arr = new Object[5];
         MatrixCursor mc = new MatrixCursor(new String[] {"_id", "tempF", "tempC", "imageURL"});
-        @Override
-        protected Void doInBackground(Void... params) {
+
+        @Override protected Void doInBackground(Void... params) {
             ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
             if(cm.getActiveNetworkInfo() == null || !cm.getActiveNetworkInfo().isConnected())
                 return null;
@@ -152,8 +143,7 @@ public class WeatherActivity extends ListActivity {
             return null;
         }
 
-        @Override
-        protected void onPostExecute(Void args){
+        @Override protected void onPostExecute(Void args){
 
             dialog.dismiss();
             if(zipcode != null) {
@@ -171,8 +161,8 @@ public class WeatherActivity extends ListActivity {
                 Log.d(TAG, "zipcode is null");
                 ImageView error  = (ImageView)findViewById(R.id.uhoh);
                 error.setImageResource(R.drawable.oh_no);
+                error.setVisibility(View.VISIBLE);
             }
-
 
         }
     }

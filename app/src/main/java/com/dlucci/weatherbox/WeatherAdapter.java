@@ -23,11 +23,10 @@ public class WeatherAdapter extends SimpleCursorAdapter{
         super(context, layout, c, from, to);
         this.context = context;
         this.layout = layout;
-
     }
 
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent){
+    @Override public View newView(Context context, Cursor cursor, ViewGroup parent){
+
         Cursor cur = getCursor();
 
         final LayoutInflater inflater = LayoutInflater.from(context);
@@ -45,13 +44,18 @@ public class WeatherAdapter extends SimpleCursorAdapter{
             f.setText(tempF);
         if(c != null)
             c.setText(tempC);
-        if(icon != null)
-            Picasso.with(context).load(imageUrl).into(icon);
+        if(icon != null) {
+            if(imageUrl == null) {
+                icon.setImageResource(R.drawable.oh_no);
+                icon.setVisibility(View.VISIBLE);
+            }else
+                Picasso.with(context).load(imageUrl).resize(150, 150).into(icon);
+        }
         return v;
     }
 
-    @Override
-    public void bindView(View v, Context context, Cursor cur){
+    @Override public void bindView(View v, Context context, Cursor cur){
+
         String tempF = cur.getString(cur.getColumnIndex("tempF")) + "F";
         String tempC = cur.getString(cur.getColumnIndex("tempC")) + "C";
         String imageUrl = cur.getString(cur.getColumnIndex("imageURL"));
@@ -70,10 +74,11 @@ public class WeatherAdapter extends SimpleCursorAdapter{
         else
             c.setText("--C");
         if(icon != null) {
-            if(imageUrl == null)
+            if(imageUrl == null) {
                 icon.setImageResource(R.drawable.oh_no);
-            else
-                Picasso.with(context).load(imageUrl).into(icon);
+                icon.setVisibility(View.VISIBLE);
+            }else
+                Picasso.with(context).load(imageUrl).resize(150, 150).into(icon);
         }
     }
 }
