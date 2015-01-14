@@ -81,7 +81,6 @@ public class WeatherActivity extends ListActivity {
 
 /*
  * We need to add a check for if there is a connection to the interblag
- *
  */
 
     private class WeatherTask extends AsyncTask<Void, Void, Void>{
