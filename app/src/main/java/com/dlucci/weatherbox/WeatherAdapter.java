@@ -35,15 +35,21 @@ public class WeatherAdapter extends SimpleCursorAdapter{
         String tempF = cur.getString(cur.getColumnIndex("tempF")) + "°F";
         String tempC = cur.getString(cur.getColumnIndex("tempC")) + "°C";
         String imageUrl = cur.getString(cur.getColumnIndex("imageURL"));
+        String date = cur.getString(cur.getColumnIndex("date"));
 
-        TextView f = (TextView) v.findViewById(R.id.temperatureF);
-        TextView c = (TextView) v.findViewById(R.id.temperatureC);
+        TextView f = (TextView) v.findViewById(R.id.temperature);
+        TextView d = (TextView) v.findViewById(R.id.date);
         ImageView icon = (ImageView) v.findViewById(R.id.icon);
 
-        if(f != null)
-            f.setText(tempF);
-        if(c != null)
-            c.setText(tempC);
+        if(f != null && tempF != null && tempC != null)
+            f.setText("Temperature:  " + tempF + "/" + tempC);
+        else
+            f.setText("--°F/--°C");
+
+        if(d != null && date != null)
+            d.setText(date);
+        else
+            d.setText("??-??-????");
         if(icon != null) {
             if(imageUrl == null) {
                 icon.setImageResource(R.drawable.oh_no);
@@ -60,19 +66,15 @@ public class WeatherAdapter extends SimpleCursorAdapter{
         String tempC = cur.getString(cur.getColumnIndex("tempC")) + "°C";
         String imageUrl = cur.getString(cur.getColumnIndex("imageURL"));
 
-        TextView f = (TextView) v.findViewById(R.id.temperatureF);
-        TextView c = (TextView) v.findViewById(R.id.temperatureC);
+        TextView f = (TextView) v.findViewById(R.id.temperature);
+        TextView d = (TextView) v.findViewById(R.id.date);
         ImageView icon = (ImageView) v.findViewById(R.id.icon);
 
-        if(tempF != null)
-            f.setText(tempF);
+        if(f != null && tempF != null && tempC != null)
+            f.setText("Temperature:  " + tempF + "/" + tempC);
         else
-            f.setText("--F");
+            f.setText("--°F/--°C");
 
-        if(tempC != null)
-            c.setText(tempC);
-        else
-            c.setText("--C");
         if(icon != null) {
             if(imageUrl == null) {
                 icon.setImageResource(R.drawable.oh_no);

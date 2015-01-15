@@ -87,7 +87,7 @@ public class WeatherActivity extends ListActivity {
 
         private String zipcode;
         private Object[] arr = new Object[5];
-        MatrixCursor mc = new MatrixCursor(new String[] {"_id", "tempF", "tempC", "imageURL"});
+        MatrixCursor mc = new MatrixCursor(new String[] {"_id", "tempF", "tempC", "imageURL", "date"});
 
         @Override protected Void doInBackground(Void... params) {
             ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -128,7 +128,8 @@ public class WeatherActivity extends ListActivity {
                     weather.setTemperatureC(j.getString("tempC"));
                     weather.setTemperatureF(j.getString("tempF"));
                     weather.setImageUrl(j.getJSONArray("weatherIconUrl").getJSONObject(0).getString("value"));
-                    mc.addRow(new Object[]{i, j.getString("tempF"), j.getString("tempC"), j.getJSONArray("weatherIconUrl").getJSONObject(0).getString("value")});
+                    weather.setDate(futureCast.getJSONObject(i).getString("date"));
+                    mc.addRow(new Object[]{i, weather.getTemperatureF(), weather.getTemperatureC(), weather.getImageUrl(), weather.getDate()});
                 }
 
             }catch(MalformedURLException e){
@@ -152,8 +153,8 @@ public class WeatherActivity extends ListActivity {
                 ListAdapter adapter = new WeatherAdapter(getApplicationContext(),
                         R.layout.weather_row,
                         mc,
-                        new String[]{"_id", "tempF", "tempC", "imageURL"},
-                        new int[]{0,R.id.temperatureF, R.id.temperatureC, R.id.icon});
+                        new String[]{"_id", "tempF", "tempC", "imageURL", "date"},
+                        new int[]{0,R.id.temperature, R.id.date, R.id.icon});
 
                 setListAdapter(adapter);
             } else {
