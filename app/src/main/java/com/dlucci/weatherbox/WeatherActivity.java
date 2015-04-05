@@ -21,6 +21,8 @@ import android.widget.TextView;
 
 import com.dlucci.weatherbox.model.Weather;
 
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,6 +57,8 @@ public class WeatherActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_list);
 
+        Log.d(TAG, "onCreate");
+
         API_KEY = getString(R.string.weatherApi);
 
         dialog = new ProgressDialog(this);
@@ -65,6 +69,7 @@ public class WeatherActivity extends ListActivity {
 
     @Override public void onResume(){
         super.onResume();
+        Log.d(TAG, "onResume");
     }
 
 
@@ -104,7 +109,7 @@ public class WeatherActivity extends ListActivity {
                 return null;
             try {
 
-                LocationManager manager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+                /*LocationManager manager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
                 Location location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
@@ -114,8 +119,8 @@ public class WeatherActivity extends ListActivity {
                     return null;
                 Address addr = list.get(0);
                 
-                zipcode = addr.getPostalCode();
-                URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q=" + zipcode + "&format=json&num_of_days=5&key="+API_KEY);
+                zipcode = addr.getPostalCode();*/
+                URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q="  /* + zipcode*/ +"44114" + "&format=json&num_of_days=5&key="+API_KEY);
 
                 HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
 
@@ -126,6 +131,10 @@ public class WeatherActivity extends ListActivity {
                 while((line = br.readLine()) != null){
                     result.append(line);
                 }
+                Log.d(TAG, result.toString());
+                ObjectMapper mapper = new ObjectMapper();
+               // mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                Weather weather = mapper.readValue(result.toString(), Weather.class);
 
                 JSONObject json = new JSONObject(result.toString());
 
@@ -133,12 +142,12 @@ public class WeatherActivity extends ListActivity {
 
                 for(int i = 0; i < 5; i++){
                     JSONObject j = futureCast.getJSONObject(i).getJSONArray("hourly").getJSONObject(0);
-                    Weather weather = new Weather();
+                    /*Weather weather = new Weather();
                     weather.setTemperatureC(j.getString("tempC"));
                     weather.setTemperatureF(j.getString("tempF"));
                     weather.setImageUrl(j.getJSONArray("weatherIconUrl").getJSONObject(0).getString("value"));
                     weather.setDate(futureCast.getJSONObject(i).getString("date"));
-                    mc.addRow(new Object[]{i, weather.getTemperatureF(), weather.getTemperatureC(), weather.getImageUrl(), weather.getDate()});
+                    mc.addRow(new Object[]{i, weather.getTemperatureF(), weather.getTemperatureC(), weather.getImageUrl(), weather.getDate()});*/
                 }
 
             }catch(MalformedURLException e){
