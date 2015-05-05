@@ -11,8 +11,6 @@ import android.util.Log;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-//import com.dlucci.weatherbox.model.Weather;
-
 import com.dlucci.weatherbox.model.Weather;
 import com.dlucci.weatherbox.model.WeatherInformation;
 
@@ -29,13 +27,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /*
- *  TODO:
- *  0. Get Jackson to work (DONE)
+ *  TODO
  *  1. Figure out a better way to do images.
- *  2. Do temperature max/min, not hourly
  *  3. If clicked, display hourly data for each day
  *  4. Add color coding for temperature (blue[t<=32], black[(32<t<75]], red[t>=75])
  *  5. Add settings for data
+ *  6. Add ViewHolder to WeatherAdapter
+ *  7. Add RetroFit for blazing fast API calls
  */
 
 public class WeatherActivity extends ListActivity {

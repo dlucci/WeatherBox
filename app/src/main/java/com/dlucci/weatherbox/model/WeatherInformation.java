@@ -1,9 +1,5 @@
 package com.dlucci.weatherbox.model;
 
-import com.dlucci.weatherbox.model.CurrentCondition;
-import com.dlucci.weatherbox.model.Request;
-import com.dlucci.weatherbox.model.Weather;
-
 import org.codehaus.jackson.map.annotate.JsonRootName;
 
 import java.util.List;
