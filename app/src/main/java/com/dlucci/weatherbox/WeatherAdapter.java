@@ -32,8 +32,8 @@ public class WeatherAdapter extends SimpleCursorAdapter{
         final LayoutInflater inflater = LayoutInflater.from(context);
         View v = inflater.inflate(layout, parent, false);
 
-        String tempF = cur.getString(cur.getColumnIndex("tempF")) + "°F";
-        String tempC = cur.getString(cur.getColumnIndex("tempC")) + "°C";
+        String tempF = cur.getString(cur.getColumnIndex("maxTemp")) + "°F";
+        String tempC = cur.getString(cur.getColumnIndex("minTemp")) + "°F";
         String imageUrl = cur.getString(cur.getColumnIndex("imageURL"));
         String date = cur.getString(cur.getColumnIndex("date"));
 
@@ -44,7 +44,7 @@ public class WeatherAdapter extends SimpleCursorAdapter{
         if(f != null && tempF != null && tempC != null)
             f.setText("Temperature:  " + tempF + "/" + tempC);
         else
-            f.setText("--°F/--°C");
+            f.setText("--°F/--°F");
 
         if(d != null && date != null)
             d.setText(date);
@@ -62,8 +62,8 @@ public class WeatherAdapter extends SimpleCursorAdapter{
 
     @Override public void bindView(View v, Context context, Cursor cur){
 
-        String tempF = cur.getString(cur.getColumnIndex("tempF")) + "°F";
-        String tempC = cur.getString(cur.getColumnIndex("tempC")) + "°C";
+        String tempF = cur.getString(cur.getColumnIndex("maxTemp")) + "°F";
+        String tempC = cur.getString(cur.getColumnIndex("minTemp")) + "°F";
         String imageUrl = cur.getString(cur.getColumnIndex("imageURL"));
 
         TextView f = (TextView) v.findViewById(R.id.temperature);
@@ -73,7 +73,7 @@ public class WeatherAdapter extends SimpleCursorAdapter{
         if(f != null && tempF != null && tempC != null)
             f.setText("Temperature:  " + tempF + "/" + tempC);
         else
-            f.setText("--°F/--°C");
+            f.setText("--°F/--°F");
 
         if(icon != null) {
             if(imageUrl == null) {

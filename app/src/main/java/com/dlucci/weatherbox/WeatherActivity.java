@@ -11,6 +11,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,8 +19,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.dlucci.weatherbox.model.Weather;
+//import com.dlucci.weatherbox.model.Weather;
 
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -35,15 +37,19 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /*
  *  TODO:
+ *  0. Get Jackson to work (DONE)
  *  1. Figure out a better way to do images.
  *  2. Do temperature max/min, not hourly
  *  3. If clicked, display hourly data for each day
  *  4. Add color coding for temperature (blue[t<=32], black[(32<t<75]], red[t>=75])
- *  5. Add settings for 
+ *  5. Add settings for data
  */
 
 public class WeatherActivity extends ListActivity {
@@ -101,9 +107,11 @@ public class WeatherActivity extends ListActivity {
 
         private String zipcode;
         private Object[] arr = new Object[5];
-        MatrixCursor mc = new MatrixCursor(new String[] {"_id", "tempF", "tempC", "imageURL", "date"});
+        MatrixCursor mc = new MatrixCursor(new String[] {"_id", "maxTemp", "minTemp", "imageURL", "date"});
 
         @Override protected Void doInBackground(Void... params) {
+
+            Log.d(TAG, "beginning doInBackground");
             ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
             if(cm.getActiveNetworkInfo() == null || !cm.getActiveNetworkInfo().isConnected())
                 return null;
@@ -124,6 +132,8 @@ public class WeatherActivity extends ListActivity {
 
                 HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
 
+                Log.d(TAG, "received communication from url");
+
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
                 BufferedReader br = new BufferedReader(new InputStreamReader(is));
                 StringBuilder result = new StringBuilder();
@@ -133,15 +143,14 @@ public class WeatherActivity extends ListActivity {
                 }
                 Log.d(TAG, result.toString());
                 ObjectMapper mapper = new ObjectMapper();
-               // mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                Weather weather = mapper.readValue(result.toString(), Weather.class);
+                mapper.configure(DeserializationConfig.Feature.UNWRAP_ROOT_VALUE, true);
+                WeatherInformation weatherInformation = mapper.readValue(result.toString(), WeatherInformation.class);
 
-                JSONObject json = new JSONObject(result.toString());
-
-                JSONArray futureCast = json.getJSONObject("data").getJSONArray("weather");
-
-                for(int i = 0; i < 5; i++){
-                    JSONObject j = futureCast.getJSONObject(i).getJSONArray("hourly").getJSONObject(0);
+                for(Weather weather : weatherInformation.weather){
+                    int i = 0;
+                    mc.addRow(new Object[]{i, weather.maxtempF, weather.mintempF, weather.hourly.get(4).weatherIconUrl.get(0).value, weather.date});
+                    i++;
+                    //JSONObject j = futureCast.getJSONObject(i).getJSONArray("hourly").getJSONObject(0);
                     /*Weather weather = new Weather();
                     weather.setTemperatureC(j.getString("tempC"));
                     weather.setTemperatureF(j.getString("tempF"));
@@ -154,8 +163,6 @@ public class WeatherActivity extends ListActivity {
                 Log.e(TAG, "URL is malformed:  " + e.getMessage());
             }catch(IOException e){
                 Log.e(TAG, "IOException:  " + e.getMessage());
-            } catch(JSONException e){
-                Log.e(TAG, "JSONException:  " + e.getMessage());
             }
 
             return null;
@@ -164,23 +171,23 @@ public class WeatherActivity extends ListActivity {
         @Override protected void onPostExecute(Void args){
 
             dialog.dismiss();
-            if(zipcode != null) {
+            //if(zipcode != null) {
                 TextView zippy = (TextView) findViewById(R.id.zipcode);
                 zippy.setText("This is the weather for " + zipcode);
 
                 ListAdapter adapter = new WeatherAdapter(getApplicationContext(),
                         R.layout.weather_row,
                         mc,
-                        new String[]{"_id", "tempF", "tempC", "imageURL", "date"},
+                        new String[]{"_id", "maxTemp", "minTemp", "imageURL", "date"},
                         new int[]{0,R.id.temperature, R.id.date, R.id.icon});
 
                 setListAdapter(adapter);
-            } else {
+            /*} else {
                 Log.d(TAG, "zipcode is null");
                 ImageView error  = (ImageView)findViewById(R.id.uhoh);
                 error.setImageResource(R.drawable.oh_no);
                 error.setVisibility(View.VISIBLE);
-            }
+            }*/
 
         }
     }
