@@ -4,30 +4,20 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.MatrixCursor;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 //import com.dlucci.weatherbox.model.Weather;
 
+import com.dlucci.weatherbox.model.Weather;
+import com.dlucci.weatherbox.model.WeatherInformation;
+
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -37,10 +27,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 /*
  *  TODO:
@@ -117,7 +103,10 @@ public class WeatherActivity extends ListActivity {
                 return null;
             try {
 
-                /*LocationManager manager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+                /*
+                TODO:  uncomment this code out before testing on an actual device...same for the zipcode stuff in onPostExecute
+
+                LocationManager manager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
                 Location location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
@@ -150,13 +139,6 @@ public class WeatherActivity extends ListActivity {
                     int i = 0;
                     mc.addRow(new Object[]{i, weather.maxtempF, weather.mintempF, weather.hourly.get(4).weatherIconUrl.get(0).value, weather.date});
                     i++;
-                    //JSONObject j = futureCast.getJSONObject(i).getJSONArray("hourly").getJSONObject(0);
-                    /*Weather weather = new Weather();
-                    weather.setTemperatureC(j.getString("tempC"));
-                    weather.setTemperatureF(j.getString("tempF"));
-                    weather.setImageUrl(j.getJSONArray("weatherIconUrl").getJSONObject(0).getString("value"));
-                    weather.setDate(futureCast.getJSONObject(i).getString("date"));
-                    mc.addRow(new Object[]{i, weather.getTemperatureF(), weather.getTemperatureC(), weather.getImageUrl(), weather.getDate()});*/
                 }
 
             }catch(MalformedURLException e){

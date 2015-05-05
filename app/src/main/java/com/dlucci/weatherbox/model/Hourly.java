@@ -1,4 +1,4 @@
-package com.dlucci.weatherbox;
+package com.dlucci.weatherbox.model;
 
 import java.util.ArrayList;
 
