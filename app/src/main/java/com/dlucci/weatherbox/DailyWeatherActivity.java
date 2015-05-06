@@ -138,7 +138,7 @@ public class DailyWeatherActivity extends ListActivity {
                 HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
                 urlConnection.setConnectTimeout(60000);
                 Log.d(TAG, "received communication from url");
-
+                Log.d(TAG, String.valueOf(urlConnection.getResponseCode()));
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
                 BufferedReader br = new BufferedReader(new InputStreamReader(is));
                 StringBuilder result = new StringBuilder();

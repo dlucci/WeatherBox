@@ -62,7 +62,7 @@ public class WeatherAdapter extends SimpleCursorAdapter{
                 icon.setImageResource(R.drawable.oh_no);
                 icon.setVisibility(View.VISIBLE);
             }else
-                Picasso.with(context).load(imageUrl).resize(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).into(icon);
+                Picasso.with(context).load(imageUrl).into(icon);
         }
 
         if(uv != null)
@@ -114,8 +114,9 @@ public class WeatherAdapter extends SimpleCursorAdapter{
             if(imageUrl == null) {
                 icon.setImageResource(R.drawable.oh_no);
                 icon.setVisibility(View.VISIBLE);
-            }else
-                Picasso.with(context).load(imageUrl).resize(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).into(icon);
+            }else {
+                Picasso.with(context).load(imageUrl).into(icon);
+            }
         }
 
         if(uv != null)
