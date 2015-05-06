@@ -3,27 +3,23 @@ package com.dlucci.weatherbox;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.database.MatrixCursor;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.dlucci.weatherbox.model.Weather;
+import com.dlucci.weatherbox.model.WeatherInformation;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -31,29 +27,46 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 
 /*
- *  TODO:
+ *  TODO
  *  1. Figure out a better way to do images.
- *  2. Do temperature max/min, not hourly
  *  3. If clicked, display hourly data for each day
  *  4. Add color coding for temperature (blue[t<=32], black[(32<t<75]], red[t>=75])
- *  5. Add settings for 
+ *  5. Add settings for weather (add cities, F->C, Days to Forecast [default is 5])
+ *  6. Add ViewHolder to WeatherAdapter
+ *  7. Add RetroFit for blazing fast API calls
  */
 
-public class WeatherActivity extends ListActivity {
+public class DailyWeatherActivity extends ListActivity {
 
-    private static final String TAG = "WeatherActivity";
+    private static final String TAG = "DailyWeatherActivity";
     private static String API_KEY;
 
     private ProgressDialog dialog;
 
+    private ListView listView;
+
+    private WeatherInformation weatherInformation;
+
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_list);
+
+        Log.d(TAG, "onCreate");
+
+        listView = (ListView) findViewById(android.R.id.list);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(DailyWeatherActivity.this, HourlyWeatherActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("Weather", weatherInformation.weather.get(position));
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
 
         API_KEY = getString(R.string.weatherApi);
 
@@ -65,6 +78,7 @@ public class WeatherActivity extends ListActivity {
 
     @Override public void onResume(){
         super.onResume();
+        Log.d(TAG, "onResume");
     }
 
 
@@ -95,14 +109,18 @@ public class WeatherActivity extends ListActivity {
     private class WeatherTask extends AsyncTask<Void, Void, Void>{
 
         private String zipcode;
-        private Object[] arr = new Object[5];
-        MatrixCursor mc = new MatrixCursor(new String[] {"_id", "tempF", "tempC", "imageURL", "date"});
+        MatrixCursor mc = new MatrixCursor(new String[] {"_id", "maxTemp", "minTemp", "imageURL", "date", "uvIndex", "sunrise", "sunset"});
 
         @Override protected Void doInBackground(Void... params) {
+
+            Log.d(TAG, "beginning doInBackground");
             ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
             if(cm.getActiveNetworkInfo() == null || !cm.getActiveNetworkInfo().isConnected())
                 return null;
             try {
+
+                /*
+                TODO:  uncomment this code out before testing on an actual device...same for the zipcode stuff in onPostExecute
 
                 LocationManager manager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
                 Location location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -114,10 +132,12 @@ public class WeatherActivity extends ListActivity {
                     return null;
                 Address addr = list.get(0);
                 
-                zipcode = addr.getPostalCode();
-                URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q=" + zipcode + "&format=json&num_of_days=5&key="+API_KEY);
+                zipcode = addr.getPostalCode();*/
+                URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q="  /* + zipcode*/ +"44114" + "&format=json&num_of_days=5&key="+API_KEY);
 
                 HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+                urlConnection.setConnectTimeout(60000);
+                Log.d(TAG, "received communication from url");
 
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
                 BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -127,26 +147,19 @@ public class WeatherActivity extends ListActivity {
                     result.append(line);
                 }
 
-                JSONObject json = new JSONObject(result.toString());
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.configure(DeserializationConfig.Feature.UNWRAP_ROOT_VALUE, true);
+                weatherInformation = mapper.readValue(result.toString(), WeatherInformation.class);
 
-                JSONArray futureCast = json.getJSONObject("data").getJSONArray("weather");
-
-                for(int i = 0; i < 5; i++){
-                    JSONObject j = futureCast.getJSONObject(i).getJSONArray("hourly").getJSONObject(0);
-                    Weather weather = new Weather();
-                    weather.setTemperatureC(j.getString("tempC"));
-                    weather.setTemperatureF(j.getString("tempF"));
-                    weather.setImageUrl(j.getJSONArray("weatherIconUrl").getJSONObject(0).getString("value"));
-                    weather.setDate(futureCast.getJSONObject(i).getString("date"));
-                    mc.addRow(new Object[]{i, weather.getTemperatureF(), weather.getTemperatureC(), weather.getImageUrl(), weather.getDate()});
+                for(Weather weather : weatherInformation.weather){
+                    int i = 0;
+                    mc.addRow(new Object[]{i, weather.maxtempF, weather.mintempF, weather.hourly.get(4).weatherIconUrl.get(0).value, weather.date, weather.uvIndex, weather.astronomy.get(0).sunrise,
+                    weather.astronomy.get(0).sunset});
+                    i++;
                 }
 
-            }catch(MalformedURLException e){
-                Log.e(TAG, "URL is malformed:  " + e.getMessage());
             }catch(IOException e){
                 Log.e(TAG, "IOException:  " + e.getMessage());
-            } catch(JSONException e){
-                Log.e(TAG, "JSONException:  " + e.getMessage());
             }
 
             return null;
@@ -155,23 +168,23 @@ public class WeatherActivity extends ListActivity {
         @Override protected void onPostExecute(Void args){
 
             dialog.dismiss();
-            if(zipcode != null) {
+            //if(zipcode != null) {
                 TextView zippy = (TextView) findViewById(R.id.zipcode);
                 zippy.setText("This is the weather for " + zipcode);
 
                 ListAdapter adapter = new WeatherAdapter(getApplicationContext(),
                         R.layout.weather_row,
                         mc,
-                        new String[]{"_id", "tempF", "tempC", "imageURL", "date"},
-                        new int[]{0,R.id.temperature, R.id.date, R.id.icon});
+                        new String[]{"_id", "maxTemp", "minTemp", "imageURL", "date", "uvIndex", "sunrise", "sunset"},
+                        new int[]{0,R.id.temperature, R.id.date, R.id.icon, R.id.uvIndex, R.id.sunrise, R.id.sunset});
 
                 setListAdapter(adapter);
-            } else {
+            /*} else {
                 Log.d(TAG, "zipcode is null");
                 ImageView error  = (ImageView)findViewById(R.id.uhoh);
                 error.setImageResource(R.drawable.oh_no);
                 error.setVisibility(View.VISIBLE);
-            }
+            }*/
 
         }
     }

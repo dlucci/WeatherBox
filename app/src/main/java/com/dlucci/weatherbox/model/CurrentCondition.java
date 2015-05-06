@@ -1,5 +1,33 @@
 package com.dlucci.weatherbox.model;
 
+<<<<<<< HEAD
+import java.util.ArrayList;
+
+/**
+ * Created by derlucci on 5/5/15.
+ */
+public class CurrentCondition {
+
+    public String cloudcover;
+    public String FeelsLikeC;
+    public String FeelsLikeF;
+    public String humidity;
+    public String observation_time;
+    public String precipMM;
+    public String pressure;
+    public String temp_C;
+    public String temp_F;
+    public String visibility;
+    public String weatherCode;
+
+    public ArrayList<WeatherDesc> weatherDesc;
+    public ArrayList<WeatherDesc> weatherIconUrl;
+
+    public String winddir16Point;
+    public String winddirDegree;
+    public String windspeedKmph;
+    public String windspeedMiles;
+=======
 /**
  * Created by derlucci on 3/13/15.
  */
@@ -166,4 +194,5 @@ public class CurrentCondition {
     public void setWeatherDesc(WeatherDesc weatherDesc) {
         this.weatherDesc = weatherDesc;
     }
+>>>>>>> 25c899d4b1be06be1ddfe2438cdf23da372cd52b
 }

@@ -1,5 +1,22 @@
 package com.dlucci.weatherbox.model;
 
+<<<<<<< HEAD
+import java.io.Serializable;
+import java.util.ArrayList;
+
+/**
+ * Created by derlucci on 5/5/15.
+ */
+public class Weather implements Serializable{
+    public ArrayList<Astronomy> astronomy;
+    public String date;
+    public ArrayList<Hourly> hourly;
+    public String maxtempC;
+    public String maxtempF;
+    public String mintempC;
+    public String mintempF;
+    public String uvIndex;
+=======
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.ArrayList;
@@ -48,4 +65,5 @@ public class Weather {
     }
 
     //public ArrayList<WeatherInformation> data;
+>>>>>>> 25c899d4b1be06be1ddfe2438cdf23da372cd52b
 }
