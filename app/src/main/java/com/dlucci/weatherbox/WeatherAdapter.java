@@ -1,7 +1,9 @@
 package com.dlucci.weatherbox;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,8 +63,11 @@ public class WeatherAdapter extends SimpleCursorAdapter{
             if(imageUrl == null) {
                 icon.setImageResource(R.drawable.oh_no);
                 icon.setVisibility(View.VISIBLE);
-            }else
-                Picasso.with(context).load(imageUrl).into(icon);
+            }else {
+                Resources r = context.getResources();
+                int px = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, r.getDisplayMetrics());
+                Picasso.with(context).load(imageUrl).resize(px, px).into(icon);
+            }
         }
 
         if(uv != null)
@@ -115,7 +120,9 @@ public class WeatherAdapter extends SimpleCursorAdapter{
                 icon.setImageResource(R.drawable.oh_no);
                 icon.setVisibility(View.VISIBLE);
             }else {
-                Picasso.with(context).load(imageUrl).into(icon);
+                Resources r = context.getResources();
+                int px = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, r.getDisplayMetrics());
+                Picasso.with(context).load(imageUrl).resize(px, px).into(icon);
             }
         }
 
