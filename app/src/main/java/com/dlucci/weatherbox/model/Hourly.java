@@ -1,11 +1,12 @@
 package com.dlucci.weatherbox.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by derlucci on 5/5/15.
  */
-public class Hourly {
+public class Hourly implements Serializable {
     public String chanceoffog;
     public String chanceoffrost;
     public String chanceofhightemp;

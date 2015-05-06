@@ -3,12 +3,16 @@ package com.dlucci.weatherbox;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.database.MatrixCursor;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.dlucci.weatherbox.model.Weather;
@@ -23,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /*
@@ -36,18 +39,34 @@ import java.net.URL;
  *  7. Add RetroFit for blazing fast API calls
  */
 
-public class WeatherActivity extends ListActivity {
+public class DailyWeatherActivity extends ListActivity {
 
-    private static final String TAG = "WeatherActivity";
+    private static final String TAG = "DailyWeatherActivity";
     private static String API_KEY;
 
     private ProgressDialog dialog;
+
+    private ListView listView;
+
+    private WeatherInformation weatherInformation;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_list);
 
         Log.d(TAG, "onCreate");
+
+        listView = (ListView) findViewById(android.R.id.list);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(DailyWeatherActivity.this, HourlyWeatherActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("Weather", weatherInformation.weather.get(position));
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
 
         API_KEY = getString(R.string.weatherApi);
 
@@ -90,8 +109,7 @@ public class WeatherActivity extends ListActivity {
     private class WeatherTask extends AsyncTask<Void, Void, Void>{
 
         private String zipcode;
-        private Object[] arr = new Object[5];
-        MatrixCursor mc = new MatrixCursor(new String[] {"_id", "maxTemp", "minTemp", "imageURL", "date"});
+        MatrixCursor mc = new MatrixCursor(new String[] {"_id", "maxTemp", "minTemp", "imageURL", "date", "uvIndex", "sunrise", "sunset"});
 
         @Override protected Void doInBackground(Void... params) {
 
@@ -118,7 +136,7 @@ public class WeatherActivity extends ListActivity {
                 URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q="  /* + zipcode*/ +"44114" + "&format=json&num_of_days=5&key="+API_KEY);
 
                 HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
-
+                urlConnection.setConnectTimeout(60000);
                 Log.d(TAG, "received communication from url");
 
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
@@ -128,19 +146,18 @@ public class WeatherActivity extends ListActivity {
                 while((line = br.readLine()) != null){
                     result.append(line);
                 }
-                Log.d(TAG, result.toString());
+
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.configure(DeserializationConfig.Feature.UNWRAP_ROOT_VALUE, true);
-                WeatherInformation weatherInformation = mapper.readValue(result.toString(), WeatherInformation.class);
+                weatherInformation = mapper.readValue(result.toString(), WeatherInformation.class);
 
                 for(Weather weather : weatherInformation.weather){
                     int i = 0;
-                    mc.addRow(new Object[]{i, weather.maxtempF, weather.mintempF, weather.hourly.get(4).weatherIconUrl.get(0).value, weather.date});
+                    mc.addRow(new Object[]{i, weather.maxtempF, weather.mintempF, weather.hourly.get(4).weatherIconUrl.get(0).value, weather.date, weather.uvIndex, weather.astronomy.get(0).sunrise,
+                    weather.astronomy.get(0).sunset});
                     i++;
                 }
 
-            }catch(MalformedURLException e){
-                Log.e(TAG, "URL is malformed:  " + e.getMessage());
             }catch(IOException e){
                 Log.e(TAG, "IOException:  " + e.getMessage());
             }
@@ -158,8 +175,8 @@ public class WeatherActivity extends ListActivity {
                 ListAdapter adapter = new WeatherAdapter(getApplicationContext(),
                         R.layout.weather_row,
                         mc,
-                        new String[]{"_id", "maxTemp", "minTemp", "imageURL", "date"},
-                        new int[]{0,R.id.temperature, R.id.date, R.id.icon});
+                        new String[]{"_id", "maxTemp", "minTemp", "imageURL", "date", "uvIndex", "sunrise", "sunset"},
+                        new int[]{0,R.id.temperature, R.id.date, R.id.icon, R.id.uvIndex, R.id.sunrise, R.id.sunset});
 
                 setListAdapter(adapter);
             /*} else {
