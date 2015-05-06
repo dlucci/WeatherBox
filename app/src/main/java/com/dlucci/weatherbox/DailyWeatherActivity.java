@@ -34,7 +34,7 @@ import java.net.URL;
  *  1. Figure out a better way to do images.
  *  3. If clicked, display hourly data for each day
  *  4. Add color coding for temperature (blue[t<=32], black[(32<t<75]], red[t>=75])
- *  5. Add settings for data
+ *  5. Add settings for weather (add cities, F->C, Days to Forecast [default is 5])
  *  6. Add ViewHolder to WeatherAdapter
  *  7. Add RetroFit for blazing fast API calls
  */
