@@ -35,8 +35,8 @@ public class WeatherAdapter extends SimpleCursorAdapter{
         final LayoutInflater inflater = LayoutInflater.from(context);
         View v = inflater.inflate(layout, parent, false);
 
-        String tempF = cur.getString(cur.getColumnIndex("maxTemp")) + "°F";
-        String tempC = cur.getString(cur.getColumnIndex("minTemp")) + "°F";
+        String maxTemp = cur.getString(cur.getColumnIndex("maxTemp")) + "°F";
+        String minTemp = cur.getString(cur.getColumnIndex("minTemp")) + "°F";
         String imageUrl = cur.getString(cur.getColumnIndex("imageURL"));
         String date = cur.getString(cur.getColumnIndex("date"));
         String uvIndex = cur.getString(cur.getColumnIndex("uvIndex"));
@@ -50,8 +50,8 @@ public class WeatherAdapter extends SimpleCursorAdapter{
         TextView rise = (TextView) v.findViewById(R.id.sunrise);
         TextView set = (TextView) v.findViewById(R.id.sunset);
 
-        if(f != null && tempF != null && tempC != null)
-            f.setText("Temperature:  " + tempF + "/" + tempC);
+        if(f != null && maxTemp != null && minTemp != null)
+            f.setText("Temperature:  " + maxTemp + "/" + minTemp);
         else
             f.setText("Temperature:  --°F/--°F");
 
@@ -90,8 +90,8 @@ public class WeatherAdapter extends SimpleCursorAdapter{
 
     @Override public void bindView(View v, Context context, Cursor cur){
 
-        String tempF = cur.getString(cur.getColumnIndex("maxTemp")) + "°F";
-        String tempC = cur.getString(cur.getColumnIndex("minTemp")) + "°F";
+        String maxTemp = cur.getString(cur.getColumnIndex("maxTemp")) + "°F";
+        String minTemp = cur.getString(cur.getColumnIndex("minTemp")) + "°F";
         String imageUrl = cur.getString(cur.getColumnIndex("imageURL"));
         String uvIndex = cur.getString(cur.getColumnIndex("uvIndex"));
         String sunrise = cur.getString(cur.getColumnIndex("sunrise"));
@@ -105,8 +105,8 @@ public class WeatherAdapter extends SimpleCursorAdapter{
         TextView rise = (TextView) v.findViewById(R.id.sunrise);
         TextView set = (TextView) v.findViewById(R.id.sunset);
 
-        if(f != null && tempF != null && tempC != null)
-            f.setText("Temperature:  " + tempF + "/" + tempC);
+        if(f != null && maxTemp != null && minTemp != null)
+            f.setText("Temperature:  " + maxTemp + "/" + minTemp);
         else
             f.setText("Temperature:  --°F/--°F");
 
