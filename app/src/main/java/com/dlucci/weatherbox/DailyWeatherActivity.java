@@ -31,11 +31,15 @@ import java.net.URL;
 
 /*
  *  TODO
- *  1. Figure out a better way to do images.
  *  3. If clicked, display hourly data for each day
- *  4. Add color coding for temperature (blue[t<=32], black[(32<t<75]], red[t>=75])
  *  5. Add settings for weather (add cities, F->C, Days to Forecast [default is 5])
  *  7. Add RetroFit for blazing fast API calls
+ *  8. Change date to say date (Saturday, May 2nd, etc) instead of 2015-05-02
+ *  9. add notification (much like accuweather app)
+ *  10. add hugo for better logging
+ *  11. add some analytics
+ *  12. put zipcode information into action bar
+ *  13. take another look at error handling
  */
 
 public class DailyWeatherActivity extends ListActivity {
