@@ -31,7 +31,6 @@ import java.net.URL;
 
 /*
  *  TODO
- *  3. If clicked, display hourly data for each day
  *  5. Add settings for weather (add cities, F->C, Days to Forecast [default is 5])
  *  7. Add RetroFit for blazing fast API calls
  *  8. Change date to say date (Saturday, May 2nd, etc) instead of 2015-05-02
@@ -175,7 +174,7 @@ public class DailyWeatherActivity extends ListActivity {
                 TextView zippy = (TextView) findViewById(R.id.zipcode);
                 zippy.setText("This is the weather for " + zipcode);
 
-                ListAdapter adapter = new WeatherAdapter(getApplicationContext(),
+                ListAdapter adapter = new DailyWeatherAdapter(getApplicationContext(),
                         R.layout.weather_row,
                         mc,
                         new String[]{"_id", "maxTemp", "minTemp", "imageURL", "date", "uvIndex", "sunrise", "sunset"},
