@@ -1,26 +1,32 @@
 package com.dlucci.weatherbox;
 
+import android.app.ActionBar;
+import static android.app.ActionBar.OnNavigationListener;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.MatrixCursor;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-
+import android.widget.SpinnerAdapter;
 import com.dlucci.weatherbox.model.Weather;
 import com.dlucci.weatherbox.model.WeatherInformation;
-
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,6 +34,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 /*
  *  TODO
@@ -37,8 +44,11 @@ import java.net.URL;
  *  9. add notification (much like accuweather app)
  *  10. add hugo for better logging
  *  11. add some analytics
- *  12. put zipcode information into action bar
  *  13. take another look at error handling
+ *  14. rename action_list to something more appropriate
+ *  15. rename model variables to camelCase values using @JSONProperties(...)
+ *  16. put butterknife in for smoother view injection
+ *  17. fix picture height on hourly activity
  */
 
 public class DailyWeatherActivity extends ListActivity {
@@ -58,6 +68,25 @@ public class DailyWeatherActivity extends ListActivity {
 
         Log.d(TAG, "onCreate");
 
+        ActionBar actionBar = getActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
+        SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.action_list,
+                android.R.layout.simple_spinner_dropdown_item);
+
+        OnNavigationListener navigationListener = new OnNavigationListener() {
+            String[] strings = getResources().getStringArray(R.array.action_list);
+
+            @Override
+            public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+                fetchWeather(strings[itemPosition]);
+
+                return true;
+            }
+        };
+
+        actionBar.setListNavigationCallbacks(spinnerAdapter, navigationListener);
+
         listView = (ListView) findViewById(android.R.id.list);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -72,10 +101,15 @@ public class DailyWeatherActivity extends ListActivity {
 
         API_KEY = getString(R.string.weatherApi);
 
+        fetchWeather("44114"); //FOR DEV PURPOSES ONLY
+    }
+
+    private void fetchWeather(String zipcode){
         dialog = new ProgressDialog(this);
         dialog.setTitle("Please wait.  Weather loading....");
         dialog.show();
-        new WeatherTask().execute();
+
+        new WeatherTask(zipcode).execute();
     }
 
     @Override public void onResume(){
@@ -83,9 +117,6 @@ public class DailyWeatherActivity extends ListActivity {
         Log.d(TAG, "onResume");
     }
 
-
-    /*
-        taking this out for now.  i'd like to add some settings once i get this layout working properly
 
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -102,7 +133,20 @@ public class DailyWeatherActivity extends ListActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }*/
+    }
+
+    public String getCurrentZipCode() throws IOException {
+        LocationManager manager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        Location location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        Geocoder geo = new Geocoder(getApplicationContext());
+        List<Address> list = geo.getFromLocation(latitude, longitude, 1);
+        if(list.size() == 0)
+            return null;
+        Address addr = list.get(0);
+        return addr.getPostalCode();
+    }
 
 /*
  * We need to add a check for if there is a connection to the interblag
@@ -112,6 +156,11 @@ public class DailyWeatherActivity extends ListActivity {
 
         private String zipcode;
         MatrixCursor mc = new MatrixCursor(new String[] {"_id", "maxTemp", "minTemp", "imageURL", "date", "uvIndex", "sunrise", "sunset"});
+
+
+        public WeatherTask(String zipcode){
+            this.zipcode = zipcode;
+        }
 
         @Override protected Void doInBackground(Void... params) {
 
@@ -124,6 +173,7 @@ public class DailyWeatherActivity extends ListActivity {
                 /*
                 TODO:  uncomment this code out before testing on an actual device...same for the zipcode stuff in onPostExecute
 
+
                 LocationManager manager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
                 Location location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 double latitude = location.getLatitude();
@@ -133,9 +183,22 @@ public class DailyWeatherActivity extends ListActivity {
                 if(list.size() == 0)
                     return null;
                 Address addr = list.get(0);
-                
                 zipcode = addr.getPostalCode();*/
-                URL url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q="  /* + zipcode*/ +"44114" + "&format=json&num_of_days=5&key="+API_KEY);
+
+                URL url;
+
+                if(zipcode != null)
+                    url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q="  + zipcode + "&format=json&num_of_days=5&key="+API_KEY);
+                else{
+                    /**
+                     * Fetch current location
+                     * get zipcode for that location
+                     */
+
+                    zipcode = DailyWeatherActivity.this.getCurrentZipCode();
+
+                    url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q="  + zipcode + "&format=json&num_of_days=5&key="+API_KEY);
+                }
 
                 HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
                 urlConnection.setConnectTimeout(60000);
@@ -171,8 +234,6 @@ public class DailyWeatherActivity extends ListActivity {
 
             dialog.dismiss();
             //if(zipcode != null) {
-                TextView zippy = (TextView) findViewById(R.id.zipcode);
-                zippy.setText("This is the weather for " + zipcode);
 
                 ListAdapter adapter = new DailyWeatherAdapter(getApplicationContext(),
                         R.layout.weather_row,
