@@ -139,7 +139,7 @@ public class HourlyWeatherAdapter extends SimpleCursorAdapter {
          if(wc != null)
              wc.setText("Wind Chill:  " + windChill + "F");
          if(ws != null)
-             ws.setText(windSpeed);
+             ws.setText("Wind Speed:  " + windSpeed);
 
     }
 }

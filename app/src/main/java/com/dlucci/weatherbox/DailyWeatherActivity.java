@@ -49,6 +49,10 @@ import java.util.List;
  *  15. rename model variables to camelCase values using @JSONProperties(...)
  *  16. put butterknife in for smoother view injection
  *  17. fix picture height on hourly activity
+ *  18. create button in action bar to get weather based on current location
+ *  19. add ability in action bar to add new zip codes
+ *  20. update action bar listener to the newest guidelines (http://developer.android.com/reference/android/app/ActionBar.OnNavigationListener.html)
+ *  21. figure out a good way of doing an action inside of the action bar listener
  */
 
 public class DailyWeatherActivity extends ListActivity {
@@ -70,7 +74,7 @@ public class DailyWeatherActivity extends ListActivity {
 
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-
+        setTitle("Daily Weather For");
         SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.action_list,
                 android.R.layout.simple_spinner_dropdown_item);
 
@@ -79,8 +83,8 @@ public class DailyWeatherActivity extends ListActivity {
 
             @Override
             public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-                fetchWeather(strings[itemPosition]);
-
+                //fetchWeather(strings[itemPosition]);
+                strings[0] = "44114";
                 return true;
             }
         };
@@ -130,6 +134,8 @@ public class DailyWeatherActivity extends ListActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -169,21 +175,6 @@ public class DailyWeatherActivity extends ListActivity {
             if(cm.getActiveNetworkInfo() == null || !cm.getActiveNetworkInfo().isConnected())
                 return null;
             try {
-
-                /*
-                TODO:  uncomment this code out before testing on an actual device...same for the zipcode stuff in onPostExecute
-
-
-                LocationManager manager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-                Location location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-                Geocoder geo = new Geocoder(getApplicationContext());
-                List<Address> list = geo.getFromLocation(latitude, longitude, 1);
-                if(list.size() == 0)
-                    return null;
-                Address addr = list.get(0);
-                zipcode = addr.getPostalCode();*/
 
                 URL url;
 

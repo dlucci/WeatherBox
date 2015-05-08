@@ -37,9 +37,11 @@ public class HourlyWeatherActivity extends ListActivity {
 
         Intent intent = getIntent();
 
-        if(intent != null){
+        if(intent != null)
             weather = (Weather)intent.getSerializableExtra("Weather");
-        }
+
+        setTitle("Hourly Weather For " + weather.date );
+
 
         list = (ListView) findViewById(android.R.id.list);
 
