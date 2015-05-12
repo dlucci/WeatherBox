@@ -1,4 +1,4 @@
-package com.dlucci.weatherbox;
+package com.dlucci.weatherbox.ui;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -19,6 +19,8 @@ import android.preference.RingtonePreference;
 import android.preference.SwitchPreference;
 import android.text.TextUtils;
 
+
+import com.dlucci.weatherbox.R;
 
 import java.util.List;
 

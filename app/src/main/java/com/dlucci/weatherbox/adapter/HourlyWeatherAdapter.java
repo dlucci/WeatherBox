@@ -1,4 +1,4 @@
-package com.dlucci.weatherbox;
+package com.dlucci.weatherbox.adapter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,6 +14,7 @@ import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.dlucci.weatherbox.R;
 import com.squareup.picasso.Picasso;
 
 /**

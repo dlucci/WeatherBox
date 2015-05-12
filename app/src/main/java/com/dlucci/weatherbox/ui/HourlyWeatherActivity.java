@@ -1,4 +1,4 @@
-package com.dlucci.weatherbox;
+package com.dlucci.weatherbox.ui;
 
 import android.app.ActionBar;
 import android.app.ListActivity;
@@ -8,13 +8,12 @@ import android.database.MatrixCursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
+import com.dlucci.weatherbox.adapter.HourlyWeatherAdapter;
+import com.dlucci.weatherbox.R;
 import com.dlucci.weatherbox.model.Hourly;
 import com.dlucci.weatherbox.model.Weather;
 

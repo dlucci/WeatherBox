@@ -1,4 +1,4 @@
-package com.dlucci.weatherbox;
+package com.dlucci.weatherbox.ui;
 
 import android.app.ActionBar;
 import static android.app.ActionBar.OnNavigationListener;
@@ -25,8 +25,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SpinnerAdapter;
+
+import com.dlucci.weatherbox.adapter.DailyWeatherAdapter;
+import com.dlucci.weatherbox.R;
 import com.dlucci.weatherbox.model.Weather;
 import com.dlucci.weatherbox.model.WeatherInformation;
+
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import java.io.BufferedInputStream;
