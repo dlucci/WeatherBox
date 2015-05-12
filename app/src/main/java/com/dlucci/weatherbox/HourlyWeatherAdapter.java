@@ -1,6 +1,7 @@
 package com.dlucci.weatherbox;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -23,6 +24,8 @@ public class HourlyWeatherAdapter extends SimpleCursorAdapter {
     private Context context;
     private int layout;
 
+    private SharedPreferences sharedPrefs;
+
     public HourlyWeatherAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
         super(context, layout, c, from, to);
         this.context = context;
@@ -36,6 +39,8 @@ public class HourlyWeatherAdapter extends SimpleCursorAdapter {
 
         View v = inflater.inflate(this.layout, parent, false);
 
+        String suffix = "°" + (sharedPrefs.getString("measurementSetting", "imperial").equals("imperial") ? "F" : "C");
+
         String hour = cur.getString(cur.getColumnIndex("time"));
         String temp = cur.getString(cur.getColumnIndex("temp"));
         String dewPoint = cur.getString(cur.getColumnIndex("dewPoint"));
@@ -69,11 +74,11 @@ public class HourlyWeatherAdapter extends SimpleCursorAdapter {
         }
 
         if(t != null)
-            t.setText("Temperature:  " + temp + "F");
+            t.setText("Temperature:  " + temp + suffix);
         if(dp != null)
-            dp.setText("Dewpoint:  " + dewPoint + "F");
+            dp.setText("Dewpoint:  " + dewPoint + suffix);
         if(f != null)
-            f.setText("Feels like:  " + feels + "F");
+            f.setText("Feels like:  " + feels + suffix);
         if(wd != null)
             wd.setText(weatherDesc);
         if(icon != null){
@@ -82,7 +87,7 @@ public class HourlyWeatherAdapter extends SimpleCursorAdapter {
             Picasso.with(this.context).load(weatherUrl).resize(px, px).into(icon);
         }
         if(wc != null)
-            wc.setText("Wind Chill:  " + windChill + "F");
+            wc.setText("Wind Chill:  " + windChill + suffix);
         if(ws != null)
             ws.setText("Wind Speed:  " + windSpeed);
 
@@ -90,6 +95,8 @@ public class HourlyWeatherAdapter extends SimpleCursorAdapter {
     }
 
     @Override public void bindView(View v, Context context, Cursor cur){
+
+        String suffix = "°" + (sharedPrefs.getString("measurementSetting", "imperial").equals("imperial") ? "F" : "C");
 
         String hour = cur.getString(cur.getColumnIndex("time"));
         String temp = cur.getString(cur.getColumnIndex("temp"));
@@ -124,11 +131,11 @@ public class HourlyWeatherAdapter extends SimpleCursorAdapter {
         }
 
         if(t != null)
-             t.setText("Temperature:  " + temp + "F");
+             t.setText("Temperature:  " + temp + suffix);
          if(dp != null)
-             dp.setText("Dewpoint:  " + dewPoint + "F");
+             dp.setText("Dewpoint:  " + dewPoint + suffix);
          if(f != null)
-             f.setText("Feels like:  " + feels + "F");
+             f.setText("Feels like:  " + feels + suffix);
          if(wd != null)
              wd.setText(weatherDesc);
          if(icon != null){
@@ -137,7 +144,7 @@ public class HourlyWeatherAdapter extends SimpleCursorAdapter {
              Picasso.with(this.context).load(weatherUrl).resize(px, px).into(icon);
          }
          if(wc != null)
-             wc.setText("Wind Chill:  " + windChill + "F");
+             wc.setText("Wind Chill:  " + windChill + suffix);
          if(ws != null)
              ws.setText("Wind Speed:  " + windSpeed);
 

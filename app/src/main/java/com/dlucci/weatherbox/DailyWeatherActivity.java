@@ -6,6 +6,7 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.MatrixCursor;
 import android.location.Address;
 import android.location.Geocoder;
@@ -14,6 +15,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +40,6 @@ import java.util.List;
 
 /*
  *  TODO
- *  5. Add settings for weather (add cities, F->C, Days to Forecast [default is 5])
  *  7. Add RetroFit for blazing fast API calls
  *  8. Change date to say date (Saturday, May 2nd, etc) instead of 2015-05-02
  *  9. add notification (much like accuweather app)
@@ -53,6 +54,9 @@ import java.util.List;
  *  19. add ability in action bar to add new zip codes
  *  20. update action bar listener to the newest guidelines (http://developer.android.com/reference/android/app/ActionBar.OnNavigationListener.html)
  *  21. figure out a good way of doing an action inside of the action bar listener
+ *  22. enable configurable home location
+ *  23. add material design
+ *  24. figure out a better way to represent time (include sharedPref on this)
  */
 
 public class DailyWeatherActivity extends ListActivity {
@@ -64,7 +68,13 @@ public class DailyWeatherActivity extends ListActivity {
 
     private ListView listView;
 
+    private SharedPreferences sharedPrefs;
+
     private WeatherInformation weatherInformation;
+
+    private SpinnerAdapter spinnerAdapter;
+
+    private ActionBar actionBar;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,10 +82,10 @@ public class DailyWeatherActivity extends ListActivity {
 
         Log.d(TAG, "onCreate");
 
-        ActionBar actionBar = getActionBar();
+        actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         setTitle("Daily Weather For");
-        SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.action_list,
+        spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.action_list,
                 android.R.layout.simple_spinner_dropdown_item);
 
         OnNavigationListener navigationListener = new OnNavigationListener() {
@@ -84,7 +94,7 @@ public class DailyWeatherActivity extends ListActivity {
             @Override
             public boolean onNavigationItemSelected(int itemPosition, long itemId) {
                 //fetchWeather(strings[itemPosition]);
-                strings[0] = "44114";
+                strings[0] = "44114";//This does not work.  We need to figure out how to dynamically change this
                 return true;
             }
         };
@@ -103,9 +113,11 @@ public class DailyWeatherActivity extends ListActivity {
             }
         });
 
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         API_KEY = getString(R.string.weatherApi);
 
-        fetchWeather("44114"); //FOR DEV PURPOSES ONLY
+
     }
 
     private void fetchWeather(String zipcode){
@@ -118,6 +130,9 @@ public class DailyWeatherActivity extends ListActivity {
 
     @Override public void onResume(){
         super.onResume();
+
+        fetchWeather("44114"); //FOR DEV PURPOSES ONLY
+
         Log.d(TAG, "onResume");
     }
 
@@ -178,8 +193,12 @@ public class DailyWeatherActivity extends ListActivity {
 
                 URL url;
 
+                Log.d(TAG, "Getting weather for " + zipcode + " and for " + sharedPrefs.getString("daySetting", "5") + " days");
+
+                boolean imperial = sharedPrefs.getString("measurementSetting", "imperial").equals("imperial") ? true : false;
+
                 if(zipcode != null)
-                    url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q="  + zipcode + "&format=json&num_of_days=5&key="+API_KEY);
+                    url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q="  + zipcode + "&format=json&num_of_days=" + sharedPrefs.getString("daySetting", "5") + "&key="+API_KEY);
                 else{
                     /**
                      * Fetch current location
@@ -188,7 +207,7 @@ public class DailyWeatherActivity extends ListActivity {
 
                     zipcode = DailyWeatherActivity.this.getCurrentZipCode();
 
-                    url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q="  + zipcode + "&format=json&num_of_days=5&key="+API_KEY);
+                    url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q="  + zipcode + "&format=json&num_of_days=" + sharedPrefs.getString("daySetting", "5") + "&key="+API_KEY);
                 }
 
                 HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
@@ -209,8 +228,12 @@ public class DailyWeatherActivity extends ListActivity {
 
                 for(Weather weather : weatherInformation.weather){
                     int i = 0;
-                    mc.addRow(new Object[]{i, weather.maxtempF, weather.mintempF, weather.hourly.get(4).weatherIconUrl.get(0).value, weather.date, weather.uvIndex, weather.astronomy.get(0).sunrise,
+                    if(imperial)
+                        mc.addRow(new Object[]{i, weather.maxtempF, weather.mintempF, weather.hourly.get(4).weatherIconUrl.get(0).value, weather.date, weather.uvIndex, weather.astronomy.get(0).sunrise,
                     weather.astronomy.get(0).sunset});
+                    else
+                        mc.addRow(new Object[]{i, weather.maxtempC, weather.mintempC, weather.hourly.get(4).weatherIconUrl.get(0).value, weather.date, weather.uvIndex, weather.astronomy.get(0).sunrise,
+                                weather.astronomy.get(0).sunset});
                     i++;
                 }
 

@@ -1,6 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="action_list">
-        <item>02050</item>
+        <item>44114</item>
+    </string-array>
+    <string-array name="measurement_array">
+        <item>Imperial</item>
+        <item>Metric</item>
+    </string-array>
+    <string-array name="measurement_values">
+        <item>imperial</item>
+        <item>metric</item>
+    </string-array>
+    <string-array name="time_array">
+        <item>12 hour</item>
+        <item>24 hour</item>
+    </string-array>
+    <string-array name="time_values">
+        <item>12</item>
+        <item>24</item>
+    </string-array>
+    <string-array name="interval_values">
+        <item>15</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+    </string-array>
+    <string-array name="interval_list">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>45 minutes</item>
+        <item>60 minutes</item>
+    </string-array>
+    <string-array name="date_array">
+        <item>5 days</item>
+        <item>10 days</item>
+        <item>15 days</item>
+        <item>20 days</item>
+    </string-array>
+    <string-array name="date_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
     </string-array>
 </resources>

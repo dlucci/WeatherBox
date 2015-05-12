@@ -1,8 +1,10 @@
 package com.dlucci.weatherbox;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,10 +24,13 @@ public class DailyWeatherAdapter extends SimpleCursorAdapter{
     private Context context;
     private int layout;
 
+    private SharedPreferences sharedPrefs;
+
     public DailyWeatherAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
         super(context, layout, c, from, to);
         this.context = context;
         this.layout = layout;
+        this.sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @Override public View newView(Context context, Cursor cursor, ViewGroup parent){
@@ -35,8 +40,10 @@ public class DailyWeatherAdapter extends SimpleCursorAdapter{
         final LayoutInflater inflater = LayoutInflater.from(context);
         View v = inflater.inflate(layout, parent, false);
 
-        String maxTemp = cur.getString(cur.getColumnIndex("maxTemp")) + "°F";
-        String minTemp = cur.getString(cur.getColumnIndex("minTemp")) + "°F";
+        String suffix = "°" + (sharedPrefs.getString("measurementSetting", "imperial").equals("imperial") ? "F" : "C");
+
+        String maxTemp = cur.getString(cur.getColumnIndex("maxTemp")) + suffix;
+        String minTemp = cur.getString(cur.getColumnIndex("minTemp")) + suffix;
         String imageUrl = cur.getString(cur.getColumnIndex("imageURL"));
         String date = cur.getString(cur.getColumnIndex("date"));
         String uvIndex = cur.getString(cur.getColumnIndex("uvIndex"));
@@ -53,7 +60,7 @@ public class DailyWeatherAdapter extends SimpleCursorAdapter{
         if(f != null && maxTemp != null && minTemp != null)
             f.setText("Temperature:  " + maxTemp + "/" + minTemp);
         else
-            f.setText("Temperature:  --°F/--°F");
+            f.setText("Temperature:  --" + suffix + "/--" + suffix);
 
         if(d != null && date != null)
             d.setText("Date:  " + date);
@@ -90,8 +97,10 @@ public class DailyWeatherAdapter extends SimpleCursorAdapter{
 
     @Override public void bindView(View v, Context context, Cursor cur){
 
-        String maxTemp = cur.getString(cur.getColumnIndex("maxTemp")) + "°F";
-        String minTemp = cur.getString(cur.getColumnIndex("minTemp")) + "°F";
+        String suffix = "°" + (sharedPrefs.getString("measurementSetting", "imperial").equals("imperial") ? "F" : "C");
+
+        String maxTemp = cur.getString(cur.getColumnIndex("maxTemp")) + suffix;
+        String minTemp = cur.getString(cur.getColumnIndex("minTemp")) + suffix;
         String imageUrl = cur.getString(cur.getColumnIndex("imageURL"));
         String uvIndex = cur.getString(cur.getColumnIndex("uvIndex"));
         String sunrise = cur.getString(cur.getColumnIndex("sunrise"));
@@ -108,7 +117,7 @@ public class DailyWeatherAdapter extends SimpleCursorAdapter{
         if(f != null && maxTemp != null && minTemp != null)
             f.setText("Temperature:  " + maxTemp + "/" + minTemp);
         else
-            f.setText("Temperature:  --°F/--°F");
+            f.setText("Temperature:  --" + suffix + "/--" + suffix);
 
         if(d != null && date != null)
             d.setText("Date:  " + date);

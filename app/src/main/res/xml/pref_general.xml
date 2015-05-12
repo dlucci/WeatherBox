@@ -1,0 +1,26 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+<ListPreference
+    android:key="measurementSetting"
+    android:title="Measurements"
+    android:entries="@array/measurement_array"
+    android:entryValues="@array/measurement_values"
+    android:defaultValue="imperial"
+    />
+ <ListPreference
+     android:key="timeSetting"
+     android:title="Time"
+     android:entries="@array/time_array"
+     android:entryValues="@array/time_values"
+     android:defaultValue="15"
+     />
+
+    <ListPreference
+        android:key="daySetting"
+        android:title="Days To Forecast"
+        android:entries="@array/date_array"
+        android:entryValues="@array/date_values"
+        android:defaultValue="5"/>
+
+
+</PreferenceScreen>
