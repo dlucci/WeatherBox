@@ -2,7 +2,8 @@ package com.dlucci.weatherbox.ui;
 
 import android.app.ActionBar;
 import static android.app.ActionBar.OnNavigationListener;
-import android.app.ListActivity;
+
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,7 +25,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.SpinnerAdapter;
 
 import com.dlucci.weatherbox.adapter.DailyWeatherAdapter;
@@ -40,8 +41,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
+import android.support.v7.widget.RecyclerView;
 /*
  *  TODO
  *  7. Add RetroFit for blazing fast API calls
@@ -63,14 +66,16 @@ import java.util.List;
  *  24. figure out a better way to represent time (include sharedPref on this)
  */
 
-public class DailyWeatherActivity extends ListActivity {
+public class DailyWeatherActivity extends Activity {
 
     private static final String TAG = "DailyWeatherActivity";
     private static String API_KEY;
 
     private ProgressDialog dialog;
 
-    private ListView listView;
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    private RecyclerView.Adapter adapter;
 
     private SharedPreferences sharedPrefs;
 
@@ -105,8 +110,10 @@ public class DailyWeatherActivity extends ListActivity {
 
         actionBar.setListNavigationCallbacks(spinnerAdapter, navigationListener);
 
-        listView = (ListView) findViewById(android.R.id.list);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        recyclerView = (RecyclerView) findViewById(R.id.list);
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        /*recyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(DailyWeatherActivity.this, HourlyWeatherActivity.class);
@@ -116,6 +123,9 @@ public class DailyWeatherActivity extends ListActivity {
                 startActivity(intent);
             }
         });
+        *
+        * Move this to the adapter
+        */
 
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -180,8 +190,7 @@ public class DailyWeatherActivity extends ListActivity {
     private class WeatherTask extends AsyncTask<Void, Void, Void>{
 
         private String zipcode;
-        MatrixCursor mc = new MatrixCursor(new String[] {"_id", "maxTemp", "minTemp", "imageURL", "date", "uvIndex", "sunrise", "sunset"});
-
+        ArrayList<Weather> weatherList;
 
         public WeatherTask(String zipcode){
             this.zipcode = zipcode;
@@ -215,7 +224,7 @@ public class DailyWeatherActivity extends ListActivity {
                 }
 
                 HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
-                urlConnection.setConnectTimeout(60000);
+
                 Log.d(TAG, "received communication from url");
                 Log.d(TAG, String.valueOf(urlConnection.getResponseCode()));
                 InputStream is = new BufferedInputStream(urlConnection.getInputStream());
@@ -230,17 +239,12 @@ public class DailyWeatherActivity extends ListActivity {
                 mapper.configure(DeserializationConfig.Feature.UNWRAP_ROOT_VALUE, true);
                 weatherInformation = mapper.readValue(result.toString(), WeatherInformation.class);
 
-                for(Weather weather : weatherInformation.weather){
-                    int i = 0;
-                    if(imperial)
-                        mc.addRow(new Object[]{i, weather.maxtempF, weather.mintempF, weather.hourly.get(4).weatherIconUrl.get(0).value, weather.date, weather.uvIndex, weather.astronomy.get(0).sunrise,
-                    weather.astronomy.get(0).sunset});
-                    else
-                        mc.addRow(new Object[]{i, weather.maxtempC, weather.mintempC, weather.hourly.get(4).weatherIconUrl.get(0).value, weather.date, weather.uvIndex, weather.astronomy.get(0).sunrise,
-                                weather.astronomy.get(0).sunset});
-                    i++;
-                }
+                weatherList = new ArrayList<>();
 
+                for(Weather weather : weatherInformation.weather){
+                    weatherList.add(weather);
+                }
+                adapter = new DailyWeatherAdapter(weatherList);
             }catch(IOException e){
                 Log.e(TAG, "IOException:  " + e.getMessage());
             }
@@ -253,13 +257,7 @@ public class DailyWeatherActivity extends ListActivity {
             dialog.dismiss();
             //if(zipcode != null) {
 
-                ListAdapter adapter = new DailyWeatherAdapter(getApplicationContext(),
-                        R.layout.weather_row,
-                        mc,
-                        new String[]{"_id", "maxTemp", "minTemp", "imageURL", "date", "uvIndex", "sunrise", "sunset"},
-                        new int[]{0,R.id.temperature, R.id.date, R.id.icon, R.id.uvIndex, R.id.sunrise, R.id.sunset});
-
-                setListAdapter(adapter);
+               recyclerView.setAdapter(adapter);
             /*} else {
                 Log.d(TAG, "zipcode is null");
                 ImageView error  = (ImageView)findViewById(R.id.uhoh);

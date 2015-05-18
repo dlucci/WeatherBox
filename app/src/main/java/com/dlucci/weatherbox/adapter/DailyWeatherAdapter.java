@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,141 +17,103 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.dlucci.weatherbox.R;
+import com.dlucci.weatherbox.model.Weather;
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 
 /**
  * Created by derrillucci on 11/20/14.
  */
-public class DailyWeatherAdapter extends SimpleCursorAdapter{
+public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapter.ViewHolder>{
 
     private Context context;
     private int layout;
 
     private SharedPreferences sharedPrefs;
+    private ArrayList<Weather> weatherList;
 
-    public DailyWeatherAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
-        super(context, layout, c, from, to);
-        this.context = context;
-        this.layout = layout;
-        this.sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+
+    public static class ViewHolder extends RecyclerView.ViewHolder{
+
+        public ImageView icon;
+        public TextView date;
+        public TextView temperature;
+        public TextView uvIndex;
+        public TextView sunrise;
+        public TextView sunset;
+
+        public Context context;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+
+            icon = (ImageView)itemView.findViewById(R.id.icon);
+            date = (TextView)itemView.findViewById(R.id.date);
+            temperature = (TextView)itemView.findViewById(R.id.temperature);
+            uvIndex = (TextView)itemView.findViewById(R.id.uvIndex);
+            sunrise = (TextView)itemView.findViewById(R.id.sunrise);
+            sunset = (TextView)itemView.findViewById(R.id.sunset);
+
+            context = itemView.getContext();
+            CardView cardView = (CardView)itemView.findViewById(R.id.dailyCardView);
+            cardView.setRadius(4);
+            cardView.setUseCompatPadding(true);
+        }
     }
 
-    @Override public View newView(Context context, Cursor cursor, ViewGroup parent){
-
-        Cursor cur = getCursor();
-
-        final LayoutInflater inflater = LayoutInflater.from(context);
-        View v = inflater.inflate(layout, parent, false);
-
-        String suffix = "°" + (sharedPrefs.getString("measurementSetting", "imperial").equals("imperial") ? "F" : "C");
-
-        String maxTemp = cur.getString(cur.getColumnIndex("maxTemp")) + suffix;
-        String minTemp = cur.getString(cur.getColumnIndex("minTemp")) + suffix;
-        String imageUrl = cur.getString(cur.getColumnIndex("imageURL"));
-        String date = cur.getString(cur.getColumnIndex("date"));
-        String uvIndex = cur.getString(cur.getColumnIndex("uvIndex"));
-        String sunrise = cur.getString(cur.getColumnIndex("sunrise"));
-        String sunset = cur.getString(cur.getColumnIndex("sunset"));
-
-        TextView f = (TextView) v.findViewById(R.id.temperature);
-        TextView d = (TextView) v.findViewById(R.id.date);
-        ImageView icon = (ImageView) v.findViewById(R.id.icon);
-        TextView uv = (TextView) v.findViewById(R.id.uvIndex);
-        TextView rise = (TextView) v.findViewById(R.id.sunrise);
-        TextView set = (TextView) v.findViewById(R.id.sunset);
-
-        if(f != null && maxTemp != null && minTemp != null)
-            f.setText("Temperature:  " + maxTemp + "/" + minTemp);
-        else
-            f.setText("Temperature:  --" + suffix + "/--" + suffix);
-
-        if(d != null && date != null)
-            d.setText("Date:  " + date);
-        else
-            d.setText("Date:  ??-??-????");
-        if(icon != null) {
-            if(imageUrl == null) {
-                icon.setImageResource(R.drawable.oh_no);
-                icon.setVisibility(View.VISIBLE);
-            }else {
-                Resources r = context.getResources();
-                int px = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, r.getDisplayMetrics());
-                Picasso.with(context).load(imageUrl).resize(px, px).into(icon);
-            }
-        }
-
-        if(uv != null)
-            uv.setText("uvIndex:  " + uvIndex);
-        else
-            uv.setText("uvIndex:  --");
-
-        if(rise != null)
-            rise.setText("Sunrise:  "  + sunrise);
-        else
-            rise.setText("Sunrise:  --:--");
-
-        if(set != null)
-            set.setText("Sunset:  " + sunset);
-        else
-            set.setText("Sunset:  --:--");
-
-        return v;
+    public DailyWeatherAdapter(ArrayList<Weather> weathers) {
+        weatherList = weathers;
     }
 
-    @Override public void bindView(View v, Context context, Cursor cur){
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
 
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.weather_row, viewGroup, false);
+
+        ViewHolder viewHolder = new ViewHolder(v);
+        return viewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder viewHolder, int i) {
+
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(viewHolder.context);
         String suffix = "°" + (sharedPrefs.getString("measurementSetting", "imperial").equals("imperial") ? "F" : "C");
 
-        String maxTemp = cur.getString(cur.getColumnIndex("maxTemp")) + suffix;
-        String minTemp = cur.getString(cur.getColumnIndex("minTemp")) + suffix;
-        String imageUrl = cur.getString(cur.getColumnIndex("imageURL"));
-        String uvIndex = cur.getString(cur.getColumnIndex("uvIndex"));
-        String sunrise = cur.getString(cur.getColumnIndex("sunrise"));
-        String sunset = cur.getString(cur.getColumnIndex("sunset"));
-        String date = cur.getString(cur.getColumnIndex("date"));
+        String[] dataArr = new String[7];
 
-        TextView f = (TextView) v.findViewById(R.id.temperature);
-        TextView d = (TextView) v.findViewById(R.id.date);
-        ImageView icon = (ImageView) v.findViewById(R.id.icon);
-        TextView uv = (TextView) v.findViewById(R.id.uvIndex);
-        TextView rise = (TextView) v.findViewById(R.id.sunrise);
-        TextView set = (TextView) v.findViewById(R.id.sunset);
+        dataArr[2] = weatherList.get(i).hourly.get(4).weatherIconUrl.get(0).value;
+        dataArr[3] = weatherList.get(i).date;
+        dataArr[4] = weatherList.get(i).uvIndex;
+        dataArr[5] = weatherList.get(i).astronomy.get(0).sunrise;
+        dataArr[6] = weatherList.get(i).astronomy.get(0).sunset;
 
-        if(f != null && maxTemp != null && minTemp != null)
-            f.setText("Temperature:  " + maxTemp + "/" + minTemp);
-        else
-            f.setText("Temperature:  --" + suffix + "/--" + suffix);
-
-        if(d != null && date != null)
-            d.setText("Date:  " + date);
-        else
-            d.setText("Date:  ??-??-????");
-
-        if(icon != null) {
-            if(imageUrl == null) {
-                icon.setImageResource(R.drawable.oh_no);
-                icon.setVisibility(View.VISIBLE);
-            }else {
-                Resources r = context.getResources();
-                int px = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, r.getDisplayMetrics());
-                Picasso.with(context).load(imageUrl).resize(px, px).into(icon);
-            }
+        if(suffix.contains("C")){
+            dataArr[0] = weatherList.get(i).maxtempC;
+            dataArr[1] = weatherList.get(i).mintempC;
+        }else{
+            dataArr[0] = weatherList.get(i).maxtempF;
+            dataArr[1] = weatherList.get(i).mintempF;
         }
 
-        if(uv != null)
-            uv.setText("uvIndex:  " + uvIndex);
-        else
-            uv.setText("uvIndex:  --");
+        viewHolder.temperature.setText("Temperature:  " + dataArr[0] + suffix + "/" + dataArr[1] + suffix);
+        viewHolder.date.setText("Date:  " + dataArr[3]);
 
-        if(rise != null)
-            rise.setText("Sunrise:  " + sunrise);
-        else
-            rise.setText("Sunrise:  --:--");
+        Resources r = viewHolder.context.getResources();
+        int px = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, r.getDisplayMetrics());
+        Picasso.with(viewHolder.context).load(dataArr[2]).resize(px, px).into(viewHolder.icon);
 
-        if(set != null)
-            set.setText("Sunset:  " + sunset);
-        else
-            set.setText("Sunset:  --:--");
+        viewHolder.uvIndex.setText("uvIndex:  " + dataArr[4]);
+        viewHolder.sunrise.setText("Sunrise:  " + dataArr[5]);
+        viewHolder.sunset.setText("Sunset:  " + dataArr[6]);
+    }
 
+    @Override
+    public int getItemCount() {
+        return weatherList.size();
     }
 }
