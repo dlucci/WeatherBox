@@ -31,6 +31,7 @@ import com.dlucci.weatherbox.adapter.DailyWeatherAdapter;
 import com.dlucci.weatherbox.R;
 import com.dlucci.weatherbox.model.Weather;
 import com.dlucci.weatherbox.model.WeatherInformation;
+import com.dlucci.weatherbox.util.RecyclerViewItemClick;
 
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -113,19 +114,17 @@ public class DailyWeatherActivity extends Activity {
         recyclerView = (RecyclerView) findViewById(R.id.list);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        /*recyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        recyclerView.addOnItemTouchListener(new RecyclerViewItemClick(this, new RecyclerViewItemClick.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(View view, int position) {
                 Intent intent = new Intent(DailyWeatherActivity.this, HourlyWeatherActivity.class);
                 Bundle bundle = new Bundle();
+
                 bundle.putSerializable("Weather", weatherInformation.weather.get(position));
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
-        });
-        *
-        * Move this to the adapter
-        */
+        }));
 
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -241,9 +240,9 @@ public class DailyWeatherActivity extends Activity {
 
                 weatherList = new ArrayList<>();
 
-                for(Weather weather : weatherInformation.weather){
+                for(Weather weather : weatherInformation.weather)
                     weatherList.add(weather);
-                }
+
                 adapter = new DailyWeatherAdapter(weatherList);
             }catch(IOException e){
                 Log.e(TAG, "IOException:  " + e.getMessage());

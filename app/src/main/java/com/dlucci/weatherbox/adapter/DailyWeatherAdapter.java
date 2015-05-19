@@ -3,7 +3,6 @@ package com.dlucci.weatherbox.adapter;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -12,15 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.dlucci.weatherbox.R;
 import com.dlucci.weatherbox.model.Weather;
 import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -29,13 +24,7 @@ import java.util.ArrayList;
  */
 public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapter.ViewHolder>{
 
-    private Context context;
-    private int layout;
-
-    private SharedPreferences sharedPrefs;
     private ArrayList<Weather> weatherList;
-
-
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
@@ -48,7 +37,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
 
         public Context context;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(final View itemView) {
             super(itemView);
 
             icon = (ImageView)itemView.findViewById(R.id.icon);
@@ -81,7 +70,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
 
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(viewHolder.context);
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(viewHolder.context);
         String suffix = "°" + (sharedPrefs.getString("measurementSetting", "imperial").equals("imperial") ? "F" : "C");
 
         String[] dataArr = new String[7];

@@ -3,151 +3,130 @@ package com.dlucci.weatherbox.adapter;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.database.Cursor;
-import android.database.MatrixCursor;
+import android.preference.PreferenceManager;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.dlucci.weatherbox.R;
+import com.dlucci.weatherbox.model.Hourly;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 /**
  * Created by derlucci on 5/6/15.
  */
-public class HourlyWeatherAdapter extends SimpleCursorAdapter {
+public class HourlyWeatherAdapter extends RecyclerView.Adapter<HourlyWeatherAdapter.ViewHolder> {
 
-    private Context context;
-    private int layout;
 
-    private SharedPreferences sharedPrefs;
+   private ArrayList<Hourly> hourlyArrayList;
 
-    public HourlyWeatherAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
-        super(context, layout, c, from, to);
-        this.context = context;
-        this.layout = layout;
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public ImageView icon;
+        public TextView hour;
+        public TextView temperature;
+        public TextView dewPoint;
+        public TextView feelsLike;
+        public TextView weatherDescription;
+        public TextView windChill;
+        public TextView windSpeed;
+
+        public Context context;
+
+        public CardView cardView;
+
+        public ViewHolder(View view) {
+            super(view);
+
+            icon = (ImageView) view.findViewById(R.id.weatherImage);
+            hour = (TextView) view.findViewById(R.id.hour);
+            temperature = (TextView) view.findViewById(R.id.temperature);
+            dewPoint = (TextView) view.findViewById(R.id.dewPoint);
+            feelsLike = (TextView) view.findViewById(R.id.feelsLike);
+            weatherDescription = (TextView) view.findViewById(R.id.weatherDescription);
+            windChill = (TextView) view.findViewById(R.id.windChill);
+            windSpeed = (TextView) view.findViewById(R.id.windSpeed);
+
+            context = view.getContext();
+
+            cardView = (CardView) view.findViewById(R.id.hourlyCardView);
+            cardView.setUseCompatPadding(true);
+        }
     }
 
-    @Override public View newView(Context context, Cursor cursor, ViewGroup parent){
-        Cursor cur = getCursor();
-
-        final LayoutInflater inflater = LayoutInflater.from(context);
-
-        View v = inflater.inflate(this.layout, parent, false);
-
-        String suffix = "°" + (sharedPrefs.getString("measurementSetting", "imperial").equals("imperial") ? "F" : "C");
-
-        String hour = cur.getString(cur.getColumnIndex("time"));
-        String temp = cur.getString(cur.getColumnIndex("temp"));
-        String dewPoint = cur.getString(cur.getColumnIndex("dewPoint"));
-        String feels = cur.getString(cur.getColumnIndex("feelsLike"));
-        String weatherDesc = cur.getString(cur.getColumnIndex("weatherDesc"));
-        String weatherUrl = cur.getString(cur.getColumnIndex("weatherUrl"));
-        String windChill = cur.getString(cur.getColumnIndex("windChill"));
-        String windSpeed = cur.getString(cur.getColumnIndex("windSpeed"));
-
-        TextView h = (TextView) v.findViewById(R.id.hour);
-        TextView t = (TextView) v.findViewById(R.id.temperature);
-        TextView dp = (TextView) v.findViewById(R.id.dewPoint);
-        TextView wd = (TextView) v.findViewById(R.id.weatherDescription);
-        TextView f = (TextView) v.findViewById(R.id.feelsLike);
-        ImageView icon = (ImageView) v.findViewById(R.id.weatherImage);
-        TextView wc = (TextView) v.findViewById(R.id.windChill);
-        TextView ws = (TextView) v.findViewById(R.id.windSpeed);
-
-        if(h != null){
-
-            if(hour.length() == 3){
-               char[] chars = hour.toCharArray();
-               hour = chars[0] + ":" + chars[1] + chars[2];
-            } else if(hour.length() == 4) {
-                int value = new Integer(Integer.valueOf(hour));
-                value = value/100;
-                hour = new String(new Integer(value).toString()) + ":00";
-            }
-
-            h.setText(hour);
-        }
-
-        if(t != null)
-            t.setText("Temperature:  " + temp + suffix);
-        if(dp != null)
-            dp.setText("Dewpoint:  " + dewPoint + suffix);
-        if(f != null)
-            f.setText("Feels like:  " + feels + suffix);
-        if(wd != null)
-            wd.setText(weatherDesc);
-        if(icon != null){
-            Resources r = this.context.getResources();
-            int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, r.getDisplayMetrics());
-            Picasso.with(this.context).load(weatherUrl).resize(px, px).into(icon);
-        }
-        if(wc != null)
-            wc.setText("Wind Chill:  " + windChill + suffix);
-        if(ws != null)
-            ws.setText("Wind Speed:  " + windSpeed);
-
-        return v;
+    public HourlyWeatherAdapter(ArrayList<Hourly> hourlyArrayList){
+        this.hourlyArrayList = hourlyArrayList;
     }
 
-    @Override public void bindView(View v, Context context, Cursor cur){
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.hourly_weather_row, parent, false);
 
+        ViewHolder holder = new ViewHolder(v);
+
+        return holder;
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(holder.context);
         String suffix = "°" + (sharedPrefs.getString("measurementSetting", "imperial").equals("imperial") ? "F" : "C");
 
-        String hour = cur.getString(cur.getColumnIndex("time"));
-        String temp = cur.getString(cur.getColumnIndex("temp"));
-        String feels = cur.getString(cur.getColumnIndex("feelsLike"));
-        String dewPoint = cur.getString(cur.getColumnIndex("dewPoint"));
-        String weatherDesc = cur.getString(cur.getColumnIndex("weatherDesc"));
-        String weatherUrl = cur.getString(cur.getColumnIndex("weatherUrl"));
-        String windChill = cur.getString(cur.getColumnIndex("windChill"));
-        String windSpeed = cur.getString(cur.getColumnIndex("windSpeed"));
-
-        TextView h = (TextView) v.findViewById(R.id.hour);
-        TextView t = (TextView) v.findViewById(R.id.temperature);
-        TextView dp = (TextView) v.findViewById(R.id.dewPoint);
-        TextView f = (TextView) v.findViewById(R.id.feelsLike);
-        TextView wd = (TextView) v.findViewById(R.id.weatherDescription);
-        ImageView icon = (ImageView) v.findViewById(R.id.weatherImage);
-        TextView wc = (TextView) v.findViewById(R.id.windChill);
-        TextView ws = (TextView) v.findViewById(R.id.windSpeed);
-
-        if(h != null){
-
-            if(hour.length() == 3){
-               char[] chars = hour.toCharArray();
-               hour = chars[0] + ":" + chars[1] + chars[2];
-            } else if(hour.length() == 4) {
-                int value = new Integer(Integer.valueOf(hour));
-                value = value/100;
-                hour = new String(new Integer(value).toString()) + ":00";
-            }
-
-            h.setText(hour);
+        String[] dataArr = new String[8];
+        dataArr[0] = hourlyArrayList.get(position).weatherIconUrl.get(0).value;
+        dataArr[1] = hourlyArrayList.get(position).time;
+        dataArr[5] = hourlyArrayList.get(position).weatherDesc.get(0).value;
+        if(suffix.contains("C")){
+            dataArr[2] = hourlyArrayList.get(position).tempC;
+            dataArr[3] = hourlyArrayList.get(position).DewPointC;
+            dataArr[4] = hourlyArrayList.get(position).FeelsLikeC;
+            dataArr[6] = hourlyArrayList.get(position).WindChillC;
+            dataArr[7] = hourlyArrayList.get(position).windspeedKmph;
+        } else {
+            dataArr[2] = hourlyArrayList.get(position).tempF;
+            dataArr[3] = hourlyArrayList.get(position).DewPointF;
+            dataArr[4] = hourlyArrayList.get(position).FeelsLikeF;
+            dataArr[6] = hourlyArrayList.get(position).WindChillF;
+            dataArr[7] = hourlyArrayList.get(position).windspeedMiles;
         }
 
-        if(t != null)
-             t.setText("Temperature:  " + temp + suffix);
-         if(dp != null)
-             dp.setText("Dewpoint:  " + dewPoint + suffix);
-         if(f != null)
-             f.setText("Feels like:  " + feels + suffix);
-         if(wd != null)
-             wd.setText(weatherDesc);
-         if(icon != null){
-             Resources r = this.context.getResources();
-             int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, r.getDisplayMetrics());
-             Picasso.with(this.context).load(weatherUrl).resize(px, px).into(icon);
-         }
-         if(wc != null)
-             wc.setText("Wind Chill:  " + windChill + suffix);
-         if(ws != null)
-             ws.setText("Wind Speed:  " + windSpeed);
+        Resources r = holder.context.getResources();
+        int px = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, r.getDisplayMetrics());
+        Picasso.with(holder.context).load(dataArr[0]).resize(px, px).into(holder.icon);
 
+        if(dataArr[1] != null){
+
+            if(dataArr[1].length() == 3){
+                char[] chars = dataArr[1].toCharArray();
+                dataArr[1] = chars[0] + ":" + chars[1] + chars[2];
+            } else if(dataArr[1].length() == 4) {
+                int value = new Integer(Integer.valueOf(dataArr[1]));
+                value = value/100;
+                dataArr[1] = new String(new Integer(value).toString()) + ":00";
+            }
+
+            holder.hour.setText(dataArr[1]);
+        }
+
+        holder.temperature.setText("Temperature:  " + dataArr[2] + suffix);
+        holder.dewPoint.setText("Dew Point:  " + dataArr[3] + suffix);
+        holder.feelsLike.setText("Feels Like " + dataArr[4] + suffix);
+        holder.weatherDescription.setText(dataArr[5]);
+        holder.windChill.setText("Wind Chill:  " + dataArr[6] + suffix);
+        holder.windSpeed.setText("Wind Speed:  " + dataArr[7]);
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return hourlyArrayList.size();
     }
 }
