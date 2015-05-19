@@ -63,7 +63,6 @@ import android.support.v7.widget.RecyclerView;
  *  20. update action bar listener to the newest guidelines (http://developer.android.com/reference/android/app/ActionBar.OnNavigationListener.html)
  *  21. figure out a good way of doing an action inside of the action bar listener
  *  22. enable configurable home location
- *  23. add material design
  *  24. figure out a better way to represent time (include sharedPref on this)
  */
 

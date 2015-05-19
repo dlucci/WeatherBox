@@ -17,7 +17,11 @@ import com.dlucci.weatherbox.R;
 import com.dlucci.weatherbox.model.Hourly;
 import com.squareup.picasso.Picasso;
 
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by derlucci on 5/6/15.
@@ -84,7 +88,7 @@ public class HourlyWeatherAdapter extends RecyclerView.Adapter<HourlyWeatherAdap
         dataArr[0] = hourlyArrayList.get(position).weatherIconUrl.get(0).value;
         dataArr[1] = hourlyArrayList.get(position).time;
         dataArr[5] = hourlyArrayList.get(position).weatherDesc.get(0).value;
-        if(suffix.contains("C")){
+        if (suffix.contains("C")) {
             dataArr[2] = hourlyArrayList.get(position).tempC;
             dataArr[3] = hourlyArrayList.get(position).DewPointC;
             dataArr[4] = hourlyArrayList.get(position).FeelsLikeC;
@@ -99,31 +103,29 @@ public class HourlyWeatherAdapter extends RecyclerView.Adapter<HourlyWeatherAdap
         }
 
         Resources r = holder.context.getResources();
-        int px = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, r.getDisplayMetrics());
+        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 120, r.getDisplayMetrics());
         Picasso.with(holder.context).load(dataArr[0]).resize(px, px).into(holder.icon);
 
-        if(dataArr[1] != null){
-
-            if(dataArr[1].length() == 3){
-                char[] chars = dataArr[1].toCharArray();
-                dataArr[1] = chars[0] + ":" + chars[1] + chars[2];
-            } else if(dataArr[1].length() == 4) {
-                int value = new Integer(Integer.valueOf(dataArr[1]));
-                value = value/100;
-                dataArr[1] = new String(new Integer(value).toString()) + ":00";
+        if (dataArr[1] != null) {
+            String postifx = "AM";
+            int date = (new Integer(dataArr[1])) / 100;
+            if (sharedPrefs.getString("timeSetting", "24").equals("12")) {
+                if (date >= 12) {
+                    date = date - 12;
+                    postifx = "PM";
+                }
+                dataArr[1] = date + ":00" + postifx;
             }
-
-            holder.hour.setText(dataArr[1]);
         }
-
+        holder.hour.setText(dataArr[1]);
         holder.temperature.setText("Temperature:  " + dataArr[2] + suffix);
         holder.dewPoint.setText("Dew Point:  " + dataArr[3] + suffix);
         holder.feelsLike.setText("Feels Like " + dataArr[4] + suffix);
         holder.weatherDescription.setText(dataArr[5]);
         holder.windChill.setText("Wind Chill:  " + dataArr[6] + suffix);
         holder.windSpeed.setText("Wind Speed:  " + dataArr[7]);
-
     }
+
 
     @Override
     public int getItemCount() {
