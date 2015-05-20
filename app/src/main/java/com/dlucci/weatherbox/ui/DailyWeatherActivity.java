@@ -46,7 +46,6 @@ import static android.app.ActionBar.OnNavigationListener;
 /*
  *  TODO
  *  7. Add RetroFit for blazing fast API calls
- *  8. Change date to say date (Saturday, May 2nd, etc) instead of 2015-05-02
  *  9. add notification (much like accuweather app)
  *  10. add hugo for better logging
  *  11. add some analytics

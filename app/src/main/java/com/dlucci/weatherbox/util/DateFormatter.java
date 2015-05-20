@@ -2,6 +2,8 @@ package com.dlucci.weatherbox.util;
 
 import android.util.Log;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -38,10 +40,6 @@ public class DateFormatter {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(help);
-
-        Log.d(TAG, "Day of the week is " + calendar.get(Calendar.DAY_OF_WEEK));
-        Log.d(TAG, "Month of the year is " + calendar.get(Calendar.MONTH));
-        Log.d(TAG, "And here is January:  " + String.valueOf(Calendar.JANUARY));
 
         return getDay(calendar.get(Calendar.DAY_OF_WEEK)) + " " + (++month) + "/" + day;
     }
