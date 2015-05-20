@@ -18,12 +18,7 @@ import com.dlucci.weatherbox.model.Weather;
 import com.dlucci.weatherbox.util.DateFormatter;
 import com.squareup.picasso.Picasso;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  * Created by derrillucci on 11/20/14.

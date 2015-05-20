@@ -28,9 +28,8 @@ import com.dlucci.weatherbox.adapter.DailyWeatherAdapter;
 import com.dlucci.weatherbox.model.Weather;
 import com.dlucci.weatherbox.model.WeatherInformation;
 import com.dlucci.weatherbox.util.RecyclerViewItemClick;
-
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -41,6 +40,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static android.app.ActionBar.OnNavigationListener;
 /*
@@ -59,7 +59,7 @@ import static android.app.ActionBar.OnNavigationListener;
  *  21. figure out a good way of doing an action inside of the action bar listener
  *  22. enable configurable home location
  *  23. PULL TO REFRESH (sample in the android samples [$SDK_HOME/samples])
- *  24. take out jackson...insert gson
+ *  25. take another look at the date stuff.  i don't like having to roll my own solution
  */
 
 public class DailyWeatherActivity extends Activity {
@@ -177,6 +177,8 @@ public class DailyWeatherActivity extends Activity {
         return addr.getPostalCode();
     }
 
+
+
 /*
  * We need to add a check for if there is a connection to the interblag
  */
@@ -229,9 +231,13 @@ public class DailyWeatherActivity extends Activity {
                     result.append(line);
                 }
 
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.configure(DeserializationConfig.Feature.UNWRAP_ROOT_VALUE, true);
-                weatherInformation = mapper.readValue(result.toString(), WeatherInformation.class);
+                Gson gson = new GsonBuilder().create();
+
+
+                //ugly hack to get around wrapping data object
+                Map<String, Object> r = gson.fromJson(result.toString(), Map.class);
+                String inner = gson.toJson(r.get("data"));
+                weatherInformation = gson.fromJson(inner, WeatherInformation.class);
 
                 weatherList = new ArrayList<>();
 
@@ -260,5 +266,11 @@ public class DailyWeatherActivity extends Activity {
             }*/
 
         }
+
+
     }
+
+
+
+
 }
