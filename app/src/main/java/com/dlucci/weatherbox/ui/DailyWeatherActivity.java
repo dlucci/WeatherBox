@@ -27,25 +27,21 @@ import com.dlucci.weatherbox.R;
 import com.dlucci.weatherbox.adapter.DailyWeatherAdapter;
 import com.dlucci.weatherbox.model.Weather;
 import com.dlucci.weatherbox.model.WeatherInformation;
+import com.dlucci.weatherbox.networking.WeatherService;
 import com.dlucci.weatherbox.util.RecyclerViewItemClick;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import retrofit.RestAdapter;
+
 import static android.app.ActionBar.OnNavigationListener;
 /*
  *  TODO
- *  7. Add RetroFit for blazing fast API calls
  *  9. add notification (much like accuweather app)
  *  10. add hugo for better logging
  *  11. add some analytics
@@ -200,44 +196,23 @@ public class DailyWeatherActivity extends Activity {
                 return null;
             try {
 
-                URL url;
-
                 Log.d(TAG, "Getting weather for " + zipcode + " and for " + sharedPrefs.getString("daySetting", "5") + " days");
 
-                boolean imperial = sharedPrefs.getString("measurementSetting", "imperial").equals("imperial") ? true : false;
 
-                if(zipcode != null)
-                    url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q="  + zipcode + "&format=json&num_of_days=" + sharedPrefs.getString("daySetting", "5") + "&key="+API_KEY);
-                else{
-                    /**
-                     * Fetch current location
-                     * get zipcode for that location
-                     */
-
+                if(zipcode == null)
                     zipcode = DailyWeatherActivity.this.getCurrentZipCode();
 
-                    url = new URL("http://api.worldweatheronline.com/free/v2/weather.ashx?q="  + zipcode + "&format=json&num_of_days=" + sharedPrefs.getString("daySetting", "5") + "&key="+API_KEY);
-                }
+                RestAdapter restAdapter = new RestAdapter.Builder()
+                        .setEndpoint("http://api.worldweatheronline.com")
+                        .build();
 
-                HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+                WeatherService weatherService = restAdapter.create(WeatherService.class);
+                Gson gson = new GsonBuilder().create();
+                Map<String, Object> obj = weatherService.getWeather(zipcode, sharedPrefs.getString("daySetting", "5"), API_KEY);
+                String inner = gson.toJson(obj.get("data"));
+                weatherInformation = gson.fromJson(inner, WeatherInformation.class);
 
                 Log.d(TAG, "received communication from url");
-                Log.d(TAG, String.valueOf(urlConnection.getResponseCode()));
-                InputStream is = new BufferedInputStream(urlConnection.getInputStream());
-                BufferedReader br = new BufferedReader(new InputStreamReader(is));
-                StringBuilder result = new StringBuilder();
-                String line;
-                while((line = br.readLine()) != null){
-                    result.append(line);
-                }
-
-                Gson gson = new GsonBuilder().create();
-
-
-                //ugly hack to get around wrapping data object
-                Map<String, Object> r = gson.fromJson(result.toString(), Map.class);
-                String inner = gson.toJson(r.get("data"));
-                weatherInformation = gson.fromJson(inner, WeatherInformation.class);
 
                 weatherList = new ArrayList<>();
 
