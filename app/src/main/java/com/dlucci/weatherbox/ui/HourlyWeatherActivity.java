@@ -19,6 +19,9 @@ import com.dlucci.weatherbox.util.DateFormatter;
 
 import java.util.ArrayList;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 /**
  * Created by derlucci on 5/5/15.
  */
@@ -28,7 +31,8 @@ public class HourlyWeatherActivity extends Activity {
 
     private Weather weather;
 
-    private RecyclerView recyclerView;
+    @InjectView(R.id.hourlyWeather)
+    public RecyclerView recyclerView;
 
     SharedPreferences sharedPrefs;
 
@@ -36,7 +40,7 @@ public class HourlyWeatherActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.hourly_weather);
-
+        ButterKnife.inject(this);
         Intent intent = getIntent();
 
         if(intent != null)
@@ -50,7 +54,6 @@ public class HourlyWeatherActivity extends Activity {
 
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        recyclerView = (RecyclerView) findViewById(R.id.hourlyWeather);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 

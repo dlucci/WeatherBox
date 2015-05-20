@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import retrofit.RestAdapter;
 
 import static android.app.ActionBar.OnNavigationListener;
@@ -65,7 +67,8 @@ public class DailyWeatherActivity extends Activity {
 
     private ProgressDialog dialog;
 
-    private RecyclerView recyclerView;
+    @InjectView(R.id.list)
+    public RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView.Adapter adapter;
 
@@ -80,6 +83,7 @@ public class DailyWeatherActivity extends Activity {
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_list);
+        ButterKnife.inject(this);
 
         Log.d(TAG, "onCreate");
 
@@ -102,7 +106,6 @@ public class DailyWeatherActivity extends Activity {
 
         actionBar.setListNavigationCallbacks(spinnerAdapter, navigationListener);
 
-        recyclerView = (RecyclerView) findViewById(R.id.list);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addOnItemTouchListener(new RecyclerViewItemClick(this, new RecyclerViewItemClick.OnItemClickListener() {

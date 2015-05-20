@@ -19,6 +19,11 @@ import com.dlucci.weatherbox.util.DateFormatter;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.InjectViews;
 
 /**
  * Created by derrillucci on 11/20/14.
@@ -29,27 +34,22 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
+        @InjectView(R.id.icon)
         public ImageView icon;
-        public TextView date;
-        public TextView temperature;
-        public TextView uvIndex;
-        public TextView sunrise;
-        public TextView sunset;
+
+        @InjectViews({R.id.date, R.id.temperature, R.id.uvIndex, R.id.sunrise, R.id.sunset})
+        public List<TextView> textViewList;
+
+        @InjectView(R.id.dailyCardView)
+        public CardView cardView;
 
         public Context context;
 
-        public ViewHolder(final View itemView) {
-            super(itemView);
+        public ViewHolder(final View view) {
+            super(view);
+            ButterKnife.inject(this, view);
 
-            icon = (ImageView)itemView.findViewById(R.id.icon);
-            date = (TextView)itemView.findViewById(R.id.date);
-            temperature = (TextView)itemView.findViewById(R.id.temperature);
-            uvIndex = (TextView)itemView.findViewById(R.id.uvIndex);
-            sunrise = (TextView)itemView.findViewById(R.id.sunrise);
-            sunset = (TextView)itemView.findViewById(R.id.sunset);
-
-            context = itemView.getContext();
-            CardView cardView = (CardView)itemView.findViewById(R.id.dailyCardView);
+            context = view.getContext();
             cardView.setRadius(4);
             cardView.setUseCompatPadding(true);
         }
@@ -90,17 +90,16 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
             dataArr[1] = weatherList.get(i).mintempF;
         }
 
-        viewHolder.temperature.setText("Temperature:  " + dataArr[0] + suffix + "/" + dataArr[1] + suffix);
-        viewHolder.date.setText("Date:  " + DateFormatter.getToday(dataArr[3]));
+        viewHolder.textViewList.get(1).setText("Temperature:  " + dataArr[0] + suffix + "/" + dataArr[1] + suffix);
+        viewHolder.textViewList.get(0).setText("Date:  " + DateFormatter.getToday(dataArr[3]));
 
         Resources r = viewHolder.context.getResources();
         int px = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, r.getDisplayMetrics());
         Picasso.with(viewHolder.context).load(dataArr[2]).resize(px, px).into(viewHolder.icon);
 
-        viewHolder.uvIndex.setText("uvIndex:  " + dataArr[4]);
-        viewHolder.sunrise.setText("Sunrise:  " + dataArr[5]);
-        viewHolder.sunset.setText("Sunset:  " + dataArr[6]);
-
+        viewHolder.textViewList.get(2).setText("uvIndex:  " + dataArr[4]);
+        viewHolder.textViewList.get(3).setText("Sunrise:  " + dataArr[5]);
+        viewHolder.textViewList.get(4).setText("Sunset:  " + dataArr[6]);
     }
 
     @Override

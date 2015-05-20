@@ -18,6 +18,11 @@ import com.dlucci.weatherbox.model.Hourly;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.InjectViews;
 
 /**
  * Created by derlucci on 5/6/15.
@@ -28,41 +33,30 @@ public class HourlyWeatherAdapter extends RecyclerView.Adapter<HourlyWeatherAdap
     private ArrayList<Hourly> hourlyArrayList;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+
+        @InjectView(R.id.weatherImage)
         public ImageView icon;
-        public TextView hour;
-        public TextView temperature;
-        public TextView dewPoint;
-        public TextView feelsLike;
-        public TextView weatherDescription;
-        public TextView windChill;
-        public TextView windSpeed;
+
+        @InjectViews({R.id.hour, R.id.temperature, R.id.dewPoint, R.id.feelsLike, R.id.weatherDescription, R.id.windChill, R.id.windSpeed})
+        public List<TextView> textViewList;
 
         public Context context;
 
+        @InjectView(R.id.hourlyCardView)
         public CardView cardView;
 
         public ViewHolder(View view) {
             super(view);
 
-            icon = (ImageView) view.findViewById(R.id.weatherImage);
-            hour = (TextView) view.findViewById(R.id.hour);
-            temperature = (TextView) view.findViewById(R.id.temperature);
-            dewPoint = (TextView) view.findViewById(R.id.dewPoint);
-            feelsLike = (TextView) view.findViewById(R.id.feelsLike);
-            weatherDescription = (TextView) view.findViewById(R.id.weatherDescription);
-            windChill = (TextView) view.findViewById(R.id.windChill);
-            windSpeed = (TextView) view.findViewById(R.id.windSpeed);
+            ButterKnife.inject(this, view);
 
             context = view.getContext();
 
-            cardView = (CardView) view.findViewById(R.id.hourlyCardView);
             cardView.setUseCompatPadding(true);
         }
     }
 
-    public HourlyWeatherAdapter(ArrayList<Hourly> hourlyArrayList){
-        this.hourlyArrayList = hourlyArrayList;
-    }
+    public HourlyWeatherAdapter(ArrayList<Hourly> hourlyArrayList){ this.hourlyArrayList = hourlyArrayList;   }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -114,15 +108,14 @@ public class HourlyWeatherAdapter extends RecyclerView.Adapter<HourlyWeatherAdap
                 dataArr[1] = date + ":00";
             }
         }
-        holder.hour.setText(dataArr[1]);
-        holder.temperature.setText("Temperature:  " + dataArr[2] + suffix);
-        holder.dewPoint.setText("Dew Point:  " + dataArr[3] + suffix);
-        holder.feelsLike.setText("Feels Like " + dataArr[4] + suffix);
-        holder.weatherDescription.setText(dataArr[5]);
-        holder.windChill.setText("Wind Chill:  " + dataArr[6] + suffix);
-        holder.windSpeed.setText("Wind Speed:  " + dataArr[7]);
+        holder.textViewList.get(0).setText(dataArr[1]);
+        holder.textViewList.get(1).setText("Temperature:  " + dataArr[2] + suffix);
+        holder.textViewList.get(2).setText("Dew Point:  " + dataArr[3] + suffix);
+        holder.textViewList.get(3).setText("Feels Like " + dataArr[4] + suffix);
+        holder.textViewList.get(4).setText(dataArr[5]);
+        holder.textViewList.get(5).setText("Wind Chill:  " + dataArr[6] + suffix);
+        holder.textViewList.get(6).setText("Wind Speed:  " + dataArr[7]);
     }
-
 
     @Override
     public int getItemCount() {
