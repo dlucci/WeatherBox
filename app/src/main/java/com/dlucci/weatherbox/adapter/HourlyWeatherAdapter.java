@@ -17,11 +17,7 @@ import com.dlucci.weatherbox.R;
 import com.dlucci.weatherbox.model.Hourly;
 import com.squareup.picasso.Picasso;
 
-import java.sql.Time;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by derlucci on 5/6/15.
@@ -29,8 +25,7 @@ import java.util.Date;
 public class HourlyWeatherAdapter extends RecyclerView.Adapter<HourlyWeatherAdapter.ViewHolder> {
 
 
-   private ArrayList<Hourly> hourlyArrayList;
-
+    private ArrayList<Hourly> hourlyArrayList;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView icon;
@@ -115,6 +110,8 @@ public class HourlyWeatherAdapter extends RecyclerView.Adapter<HourlyWeatherAdap
                     postifx = "PM";
                 }
                 dataArr[1] = date + ":00" + postifx;
+            } else {
+                dataArr[1] = date + ":00";
             }
         }
         holder.hour.setText(dataArr[1]);

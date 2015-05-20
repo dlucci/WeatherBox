@@ -15,6 +15,7 @@ import com.dlucci.weatherbox.R;
 import com.dlucci.weatherbox.adapter.HourlyWeatherAdapter;
 import com.dlucci.weatherbox.model.Hourly;
 import com.dlucci.weatherbox.model.Weather;
+import com.dlucci.weatherbox.util.DateFormatter;
 
 import java.util.ArrayList;
 
@@ -41,7 +42,7 @@ public class HourlyWeatherActivity extends Activity {
         if(intent != null)
             weather = (Weather)intent.getSerializableExtra("Weather");
 
-        setTitle("Hourly Weather For " + weather.date);
+        setTitle("Hourly Weather For " + DateFormatter.getToday(weather.date));
 
         ActionBar actionBar = getActionBar();
 

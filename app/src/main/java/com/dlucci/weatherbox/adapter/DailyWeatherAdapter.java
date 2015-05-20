@@ -15,9 +15,15 @@ import android.widget.TextView;
 
 import com.dlucci.weatherbox.R;
 import com.dlucci.weatherbox.model.Weather;
+import com.dlucci.weatherbox.util.DateFormatter;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * Created by derrillucci on 11/20/14.
@@ -90,7 +96,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         }
 
         viewHolder.temperature.setText("Temperature:  " + dataArr[0] + suffix + "/" + dataArr[1] + suffix);
-        viewHolder.date.setText("Date:  " + dataArr[3]);
+        viewHolder.date.setText("Date:  " + DateFormatter.getToday(dataArr[3]));
 
         Resources r = viewHolder.context.getResources();
         int px = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, r.getDisplayMetrics());
@@ -99,6 +105,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         viewHolder.uvIndex.setText("uvIndex:  " + dataArr[4]);
         viewHolder.sunrise.setText("Sunrise:  " + dataArr[5]);
         viewHolder.sunset.setText("Sunset:  " + dataArr[6]);
+
     }
 
     @Override

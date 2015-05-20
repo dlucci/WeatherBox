@@ -1,14 +1,11 @@
 package com.dlucci.weatherbox.ui;
 
 import android.app.ActionBar;
-import static android.app.ActionBar.OnNavigationListener;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.MatrixCursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -18,23 +15,23 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.SpinnerAdapter;
 
-import com.dlucci.weatherbox.adapter.DailyWeatherAdapter;
 import com.dlucci.weatherbox.R;
+import com.dlucci.weatherbox.adapter.DailyWeatherAdapter;
 import com.dlucci.weatherbox.model.Weather;
 import com.dlucci.weatherbox.model.WeatherInformation;
 import com.dlucci.weatherbox.util.RecyclerViewItemClick;
 
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,7 +42,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.support.v7.widget.RecyclerView;
+import static android.app.ActionBar.OnNavigationListener;
 /*
  *  TODO
  *  7. Add RetroFit for blazing fast API calls
@@ -57,13 +54,13 @@ import android.support.v7.widget.RecyclerView;
  *  14. rename action_list to something more appropriate
  *  15. rename model variables to camelCase values using @JSONProperties(...)
  *  16. put butterknife in for smoother view injection
- *  17. fix picture height on hourly activity
  *  18. create button in action bar to get weather based on current location
  *  19. add ability in action bar to add new zip codes
  *  20. update action bar listener to the newest guidelines (http://developer.android.com/reference/android/app/ActionBar.OnNavigationListener.html)
  *  21. figure out a good way of doing an action inside of the action bar listener
  *  22. enable configurable home location
- *  24. figure out a better way to represent time (include sharedPref on this)
+ *  23. PULL TO REFRESH (sample in the android samples [$SDK_HOME/samples])
+ *  24. take out jackson...insert gson
  */
 
 public class DailyWeatherActivity extends Activity {
