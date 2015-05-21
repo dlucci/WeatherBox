@@ -2,6 +2,7 @@ package com.dlucci.weatherbox.ui;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Notification;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -50,7 +51,6 @@ import static android.app.ActionBar.OnNavigationListener;
  *  13. take another look at error handling
  *  14. rename action_list to something more appropriate
  *  15. rename model variables to camelCase values using @JSONProperties(...)
- *  16. put butterknife in for smoother view injection
  *  18. create button in action bar to get weather based on current location
  *  19. add ability in action bar to add new zip codes
  *  20. update action bar listener to the newest guidelines (http://developer.android.com/reference/android/app/ActionBar.OnNavigationListener.html)
@@ -58,6 +58,8 @@ import static android.app.ActionBar.OnNavigationListener;
  *  22. enable configurable home location
  *  23. PULL TO REFRESH (sample in the android samples [$SDK_HOME/samples])
  *  25. take another look at the date stuff.  i don't like having to roll my own solution
+ *  26. rearchitecture model classes
+ *  27. add testing
  */
 
 public class DailyWeatherActivity extends Activity {
@@ -123,6 +125,8 @@ public class DailyWeatherActivity extends Activity {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         API_KEY = getString(R.string.weatherApi);
+
+        //Notification.Builder builder = new Notification.Builder(this).
 
 
     }

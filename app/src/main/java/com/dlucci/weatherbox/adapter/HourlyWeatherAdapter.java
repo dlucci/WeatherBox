@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -74,6 +75,7 @@ public class HourlyWeatherAdapter extends RecyclerView.Adapter<HourlyWeatherAdap
         String suffix = "°" + (sharedPrefs.getString("measurementSetting", "imperial").equals("imperial") ? "F" : "C");
 
         String[] dataArr = new String[8];
+        
         dataArr[0] = hourlyArrayList.get(position).weatherIconUrl.get(0).value;
         dataArr[1] = hourlyArrayList.get(position).time;
         dataArr[5] = hourlyArrayList.get(position).weatherDesc.get(0).value;

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 /**
  * Created by derlucci on 5/5/15.
  */
-public class Hourly implements Serializable {
+public class Hourly  extends Conditions implements Serializable {
     public String chanceoffog;
     public String chanceoffrost;
     public String chanceofhightemp;
@@ -17,27 +17,15 @@ public class Hourly implements Serializable {
     public String chanceofsunshine;
     public String chanceofthunder;
     public String chanceofwindy;
-    public String cloudcover;
     public String DewPointC;
     public String DewPointF;
-    public String FeelsLikeC;
-    public String FeelsLikeF;
     public String HeatIndexC;
     public String HeatIndexF;
-    public String humidity;
-    public String precipMM;
-    public String pressure;
     public String tempC;
     public String tempF;
     public String time;
-    public String visibility;
-    public String weatherCode;
-    public ArrayList<WeatherDesc> weatherDesc;
-    public ArrayList<WeatherDesc> weatherIconUrl;
     public String WindChillC;
     public String WindChillF;
-    public String winddir16Point;
-    public String winddirDegree;
     public String WindGustKmph;
     public String WindGustMiles;
     public String windspeedKmph;
