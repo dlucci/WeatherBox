@@ -83,11 +83,11 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         dataArr[6] = weatherList.get(i).astronomy.get(0).sunset;
 
         if(suffix.contains("C")){
-            dataArr[0] = weatherList.get(i).maxtempC;
-            dataArr[1] = weatherList.get(i).mintempC;
+            dataArr[0] = weatherList.get(i).maxTempC;
+            dataArr[1] = weatherList.get(i).minTempC;
         }else{
-            dataArr[0] = weatherList.get(i).maxtempF;
-            dataArr[1] = weatherList.get(i).mintempF;
+            dataArr[0] = weatherList.get(i).maxTempF;
+            dataArr[1] = weatherList.get(i).minTempF;
         }
 
         viewHolder.textViewList.get(1).setText("Temperature:  " + dataArr[0] + suffix + "/" + dataArr[1] + suffix);

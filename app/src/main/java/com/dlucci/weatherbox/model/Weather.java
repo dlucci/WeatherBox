@@ -1,6 +1,8 @@
 package com.dlucci.weatherbox.model;
 
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -11,9 +13,13 @@ public class Weather implements Serializable{
     public ArrayList<Astronomy> astronomy;
     public String date;
     public ArrayList<Hourly> hourly;
-    public String maxtempC;
-    public String maxtempF;
-    public String mintempC;
-    public String mintempF;
+    @SerializedName("maxtempC")
+    public String maxTempC;
+    @SerializedName("maxtempF")
+    public String maxTempF;
+    @SerializedName("mintempC")
+    public String minTempC;
+    @SerializedName("mintempF")
+    public String minTempF;
     public String uvIndex;
 }

@@ -1,5 +1,7 @@
 package com.dlucci.weatherbox.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -7,9 +9,13 @@ import java.util.ArrayList;
  * Created by derlucci on 5/21/15.
  */
 public class Conditions implements Serializable {
-    public String cloudcover;
-    public String FeelsLikeC;
-    public String FeelsLikeF;
+
+    @SerializedName("cloudcover")
+    public String cloudCover;
+    @SerializedName("FeelsLikeC")
+    public String feelsLikeC;
+    @SerializedName("FeelsLikeF")
+    public String feelsLikeF;
     public String humidity;
     public String precipMM;
     public String pressure;

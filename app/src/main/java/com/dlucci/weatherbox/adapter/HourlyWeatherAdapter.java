@@ -75,22 +75,22 @@ public class HourlyWeatherAdapter extends RecyclerView.Adapter<HourlyWeatherAdap
         String suffix = "°" + (sharedPrefs.getString("measurementSetting", "imperial").equals("imperial") ? "F" : "C");
 
         String[] dataArr = new String[8];
-        
+
         dataArr[0] = hourlyArrayList.get(position).weatherIconUrl.get(0).value;
         dataArr[1] = hourlyArrayList.get(position).time;
         dataArr[5] = hourlyArrayList.get(position).weatherDesc.get(0).value;
         if (suffix.contains("C")) {
             dataArr[2] = hourlyArrayList.get(position).tempC;
-            dataArr[3] = hourlyArrayList.get(position).DewPointC;
-            dataArr[4] = hourlyArrayList.get(position).FeelsLikeC;
-            dataArr[6] = hourlyArrayList.get(position).WindChillC;
-            dataArr[7] = hourlyArrayList.get(position).windspeedKmph;
+            dataArr[3] = hourlyArrayList.get(position).dewPointC;
+            dataArr[4] = hourlyArrayList.get(position).feelsLikeC;
+            dataArr[6] = hourlyArrayList.get(position).windChillC;
+            dataArr[7] = hourlyArrayList.get(position).windSpeedKmph;
         } else {
             dataArr[2] = hourlyArrayList.get(position).tempF;
-            dataArr[3] = hourlyArrayList.get(position).DewPointF;
-            dataArr[4] = hourlyArrayList.get(position).FeelsLikeF;
-            dataArr[6] = hourlyArrayList.get(position).WindChillF;
-            dataArr[7] = hourlyArrayList.get(position).windspeedMiles;
+            dataArr[3] = hourlyArrayList.get(position).dewPointF;
+            dataArr[4] = hourlyArrayList.get(position).feelsLikeF;
+            dataArr[6] = hourlyArrayList.get(position).windChillF;
+            dataArr[7] = hourlyArrayList.get(position).windSpeedMiles;
         }
 
         Resources r = holder.context.getResources();

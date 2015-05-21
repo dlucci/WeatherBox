@@ -1,6 +1,8 @@
 package com.dlucci.weatherbox.model;
 
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 
 /**
@@ -8,9 +10,14 @@ import java.util.ArrayList;
  */
 public class CurrentCondition extends Conditions {
 
-    public String windspeedKmph;
-    public String windspeedMiles;
-    public String observation_time;
-    public String temp_C;
-    public String temp_F;
+    @SerializedName("windspeedKmph")
+    public String windSpeedKmph;
+    @SerializedName("windspeedMiles")
+    public String windSpeedMiles;
+    @SerializedName("observation_time")
+    public String observationTime;
+    @SerializedName("temp_C")
+    public String tempC;
+    @SerializedName("temp_F")
+    public String tempF;
 }
