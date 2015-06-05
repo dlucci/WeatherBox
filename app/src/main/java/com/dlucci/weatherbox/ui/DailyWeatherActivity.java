@@ -56,8 +56,10 @@ import static android.app.ActionBar.OnNavigationListener;
  *  21. figure out a good way of doing an action inside of the action bar listener
  *  22. enable configurable home location
  *  23. PULL TO REFRESH (sample in the android samples [$SDK_HOME/samples])
- *  25. take another look at the date stuff.  i don't like having to roll my own solution
+ *  25. take another look at the date stuff.  i don't like having to roll my own solution (JODA TIME BITCHES!)
  *  27. add testing
+ *  28. add themes for pre Lollipop devices
+ *  29. experiment with permissions for android m
  */
 
 public class DailyWeatherActivity extends Activity {
@@ -124,7 +126,7 @@ public class DailyWeatherActivity extends Activity {
 
         API_KEY = getString(R.string.weatherApi);
 
-        //Notification.Builder builder = new Notification.Builder(this).
+        //Notification.Builder builder = new Notification.Builder(this);
 
 
     }
