@@ -2,8 +2,8 @@ package com.dlucci.weatherbox.ui;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Notification;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,10 +11,9 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -24,23 +23,16 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
 
+import com.dlucci.weatherbox.FetchWeatherTask;
 import com.dlucci.weatherbox.R;
-import com.dlucci.weatherbox.adapter.DailyWeatherAdapter;
-import com.dlucci.weatherbox.model.Weather;
 import com.dlucci.weatherbox.model.WeatherInformation;
-import com.dlucci.weatherbox.networking.WeatherService;
 import com.dlucci.weatherbox.util.RecyclerViewItemClick;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import retrofit.RestAdapter;
 
 import static android.app.ActionBar.OnNavigationListener;
 /*
@@ -65,22 +57,33 @@ import static android.app.ActionBar.OnNavigationListener;
 public class DailyWeatherActivity extends Activity {
 
     private static final String TAG = "DailyWeatherActivity";
-    private static String API_KEY;
 
-    private ProgressDialog dialog;
+    private static ProgressDialog dialog;
 
     @InjectView(R.id.list)
-    public RecyclerView recyclerView;
+    public static RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView.Adapter adapter;
 
     private SharedPreferences sharedPrefs;
 
-    private WeatherInformation weatherInformation;
-
     private SpinnerAdapter spinnerAdapter;
 
     private ActionBar actionBar;
+
+    private WeatherInformation weatherInformation;
+
+    @InjectView(R.id.swipeRefresh)
+    public SwipeRefreshLayout swipeRefreshLayout;
+
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getBundleExtra("weather");
+
+            weatherInformation = (WeatherInformation)intent.getSerializableExtra("weather");
+        }
+    };
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,9 +127,12 @@ public class DailyWeatherActivity extends Activity {
 
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        API_KEY = getString(R.string.weatherApi);
-
-        //Notification.Builder builder = new Notification.Builder(this);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchWeather("44114");
+            }
+        });
 
 
     }
@@ -136,7 +142,7 @@ public class DailyWeatherActivity extends Activity {
         dialog.setTitle("Please wait.  Weather loading....");
         dialog.show();
 
-        new WeatherTask(zipcode).execute();
+        new FetchWeatherTask(zipcode, this).execute(swipeRefreshLayout);
     }
 
     @Override public void onResume(){
@@ -167,7 +173,7 @@ public class DailyWeatherActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public String getCurrentZipCode() throws IOException {
+    public static String getCurrentZipCode() throws IOException {
         LocationManager manager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         Location location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         double latitude = location.getLatitude();
@@ -180,79 +186,18 @@ public class DailyWeatherActivity extends Activity {
         return addr.getPostalCode();
     }
 
+    public static ProgressDialog getDialog(){
+        if(dialog != null)
+            return dialog;
 
-
-/*
- * We need to add a check for if there is a connection to the interblag
- */
-
-    private class WeatherTask extends AsyncTask<Void, Void, Void>{
-
-        private String zipcode;
-        ArrayList<Weather> weatherList;
-
-        public WeatherTask(String zipcode){
-            this.zipcode = zipcode;
-        }
-
-        @Override protected Void doInBackground(Void... params) {
-
-            Log.d(TAG, "beginning doInBackground");
-            ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-            if(cm.getActiveNetworkInfo() == null || !cm.getActiveNetworkInfo().isConnected())
-                return null;
-            try {
-
-                Log.d(TAG, "Getting weather for " + zipcode + " and for " + sharedPrefs.getString("daySetting", "5") + " days");
-
-
-                if(zipcode == null)
-                    zipcode = DailyWeatherActivity.this.getCurrentZipCode();
-
-                RestAdapter restAdapter = new RestAdapter.Builder()
-                        .setEndpoint("http://api.worldweatheronline.com")
-                        .build();
-
-                WeatherService weatherService = restAdapter.create(WeatherService.class);
-                Gson gson = new GsonBuilder().create();
-                Map<String, Object> obj = weatherService.getWeather(zipcode, sharedPrefs.getString("daySetting", "5"), API_KEY);
-                String inner = gson.toJson(obj.get("data"));
-                weatherInformation = gson.fromJson(inner, WeatherInformation.class);
-
-                Log.d(TAG, "received communication from url");
-
-                weatherList = new ArrayList<>();
-
-                for(Weather weather : weatherInformation.weather)
-                    weatherList.add(weather);
-
-                adapter = new DailyWeatherAdapter(weatherList);
-            }catch(IOException e){
-                Log.e(TAG, "IOException:  " + e.getMessage());
-            }
-
-            return null;
-        }
-
-        @Override protected void onPostExecute(Void args){
-
-            dialog.dismiss();
-            //if(zipcode != null) {
-
-               recyclerView.setAdapter(adapter);
-            /*} else {
-                Log.d(TAG, "zipcode is null");
-                ImageView error  = (ImageView)findViewById(R.id.uhoh);
-                error.setImageResource(R.drawable.oh_no);
-                error.setVisibility(View.VISIBLE);
-            }*/
-
-        }
-
-
+        return null;
     }
 
+    public static RecyclerView getRecyclerView(){
+        if(recyclerView != null)
+            return recyclerView;
 
-
-
+        return null;
+    }
 }
+

@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -36,17 +37,28 @@ public class HourlyWeatherActivity extends Activity {
 
     SharedPreferences sharedPrefs;
 
+    @InjectView(R.id.swipeRefresh)
+    public SwipeRefreshLayout swipeRefreshLayout;
+
     @Override protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.hourly_weather);
         ButterKnife.inject(this);
+
         Intent intent = getIntent();
 
         if(intent != null)
             weather = (Weather)intent.getSerializableExtra("Weather");
 
         setTitle("Hourly Weather For " + DateFormatter.getToday(weather.date));
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+            }
+        });
 
         ActionBar actionBar = getActionBar();
 
